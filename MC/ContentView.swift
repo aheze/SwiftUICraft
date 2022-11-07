@@ -29,6 +29,35 @@ enum Direction {
     }
 }
 
+struct World {
+    var width = 15
+    var height = 6
+    var coordinateToItem = [Coordinate: Item]()
+    
+    struct Coordinate: Hashable {
+        var row: Int
+        var column: Int
+        var levitation: Int
+    }
+    
+    static let defaultWorld: Self = {
+        let width = 15
+        let height = 6
+        var coordinateToItem = [Coordinate: Item]()
+        
+        for row in 0..<height {
+            for column in 0..<width {
+                let coordinate = Coordinate(row: row, column: column, levitation: 0)
+                coordinateToItem[coordinate] = Item.dirt
+            }
+        }
+        
+        let world = World(coordinateToItem: coordinateToItem)
+        
+        return world
+    }()
+}
+
 enum Item: String, CaseIterable {
     case dirt
     case grass
@@ -81,72 +110,80 @@ struct Texture {
 }
 
 struct ContentView: View {
+    @State var world = World.defaultWorld
     @State var selectedItem: Item?
     
     var body: some View {
         Color.clear.overlay {
-            VStack {
-                Spacer()
-                
-                HStack {
-                    Grid {
-                        GridRow {
-                            slot
-                            Switch(direction: .up)
-                            slot
-                        }
-                        GridRow {
-                            Switch(direction: .left)
-                            slot
-                            Switch(direction: .right)
-                        }
-                        GridRow {
-                            slot
-                            Switch(direction: .down)
-                            slot
-                        }
-                    }
-                    
-                    Spacer()
-                }
-                .overlay(alignment: .bottomTrailing) {
-                    HStack(spacing: 0) {
-                        ForEach(Item.allCases, id: \.rawValue) { item in
-                            let selected = selectedItem == item
-                            
-                            Button {
-                                selectedItem = item
-                            } label: {
-                                ItemView(item: item)
-                            }
-                            .buttonStyle(.minecraft)
-                            .overlay {
-                                if selected {
-                                    Image("selected")
-                                        .interpolation(.none)
-                                        .resizable()
-                                        .padding(-4)
-                                }
-                            }
-                            .zIndex(selected ? 1 : 0)
-                        }
-                    }
-                    .overlay {
-                        Rectangle()
-                            .strokeBorder(Color.black, lineWidth: 3)
-                            .padding(-3)
-                            .opacity(0.5)
-                    }
-                }
-            }
-            .padding(.horizontal, 5)
-            .padding(.vertical, 20)
+            controls
         }
         .background {
-            Color.blue.ignoresSafeArea()
+            LinearGradient(colors: [.blue, .white, .white, .brown], startPoint: .top, endPoint: .bottom)
+                .opacity(0.2)
+                .background(Color.white)
+                .ignoresSafeArea()
         }
     }
     
+    var controls: some View {
+        VStack {
+            Spacer()
+            
+            HStack {
+                Grid {
+                    GridRow {
+                        slot
+                        Switch(direction: .up)
+                        slot
+                    }
+                    GridRow {
+                        Switch(direction: .left)
+                        slot
+                        Switch(direction: .right)
+                    }
+                    GridRow {
+                        slot
+                        Switch(direction: .down)
+                        slot
+                    }
+                }
+                
+                Spacer()
+            }
+            .overlay(alignment: .bottomTrailing) {
+                HStack(spacing: 0) {
+                    ForEach(Item.allCases, id: \.rawValue) { item in
+                        let selected = selectedItem == item
+                        
+                        Button {
+                            selectedItem = item
+                        } label: {
+                            ItemView(item: item)
+                        }
+                        .buttonStyle(.minecraft)
+                        .overlay {
+                            if selected {
+                                Image("selected")
+                                    .interpolation(.none)
+                                    .resizable()
+                                    .padding(-4)
+                            }
+                        }
+                        .zIndex(selected ? 1 : 0)
+                    }
+                }
+                .overlay {
+                    Rectangle()
+                        .strokeBorder(Color.black, lineWidth: 3)
+                        .padding(-3)
+                        .opacity(0.5)
+                }
+            }
+        }
+        .padding(.horizontal, 5)
+        .padding(.vertical, 20)
+    }
+
     var slot: some View {
         Color.clear.gridCellUnsizedAxes([.vertical, .horizontal])
     }
@@ -177,7 +214,7 @@ struct ItemView: View {
                     Image(itemPreview)
                         .interpolation(.none)
                         .resizable()
-                        .padding(5)
+                        .padding(7)
                 } else if let block = item.block {
                     PrismCanvas(tilt: 1) {
                         block

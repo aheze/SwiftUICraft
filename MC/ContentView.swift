@@ -89,7 +89,7 @@ struct World {
         }
 
         var coordinate: Coordinate
-        var item: Item
+        var blockKind: BlockKind
         var extrusionPercentage = CGFloat(1)
     }
     
@@ -104,7 +104,7 @@ struct World {
                 let shouldBeDirt = (column - (height - row)) < 3
                 
                 let coordinate = Coordinate(row: row, column: column, levitation: 0)
-                let block = Block(coordinate: coordinate, item: shouldBeDirt ? .dirt : .grass)
+                let block = Block(coordinate: coordinate, blockKind: shouldBeDirt ? .dirt : .grass)
                 blocks.append(block)
             }
         }
@@ -116,7 +116,7 @@ struct World {
                 
                 if shouldAdd {
                     let coordinate = Coordinate(row: row, column: column, levitation: 1)
-                    let block = Block(coordinate: coordinate, item: .dirt)
+                    let block = Block(coordinate: coordinate, blockKind: .dirt)
                     blocks.append(block)
                 }
             }
@@ -129,7 +129,7 @@ struct World {
                 
                 if shouldAdd {
                     let coordinate = Coordinate(row: row, column: column, levitation: 2)
-                    let block = Block(coordinate: coordinate, item: .grass)
+                    let block = Block(coordinate: coordinate, blockKind: .grass)
                     blocks.append(block)
                 }
             }
@@ -138,7 +138,7 @@ struct World {
         /// fill in some more grass blocks at the bottom
         for (x, y) in [(2, 4), (1, 5), (2, 5), (3, 5)] {
             let coordinate = Coordinate(row: y, column: x, levitation: 2)
-            let block = Block(coordinate: coordinate, item: .grass)
+            let block = Block(coordinate: coordinate, blockKind: .grass)
             blocks.append(block)
         }
         
@@ -150,44 +150,44 @@ struct World {
                 /// first layer leaves
                 for (x, y) in [(-1, -1), (0, -1), (1, -1)] {
                     let coordinate = Coordinate(row: trunk.1 + y, column: trunk.0 + x, levitation: levitation)
-                    let block = Block(coordinate: coordinate, item: .leaf)
+                    let block = Block(coordinate: coordinate, blockKind: .leaf)
                     blocks.append(block)
                 }
                 
                 let coordinateLeft = Coordinate(row: trunk.1, column: trunk.0 - 1, levitation: levitation)
-                let blockLeft = Block(coordinate: coordinateLeft, item: .leaf)
+                let blockLeft = Block(coordinate: coordinateLeft, blockKind: .leaf)
                 blocks.append(blockLeft)
                 
                 let coordinate = Coordinate(row: trunk.1, column: trunk.0, levitation: levitation)
-                let block = Block(coordinate: coordinate, item: .log)
+                let block = Block(coordinate: coordinate, blockKind: .log)
                 blocks.append(block)
                 
                 let coordinateRight = Coordinate(row: trunk.1, column: trunk.0 + 1, levitation: levitation)
-                let blockRight = Block(coordinate: coordinateRight, item: .leaf)
+                let blockRight = Block(coordinate: coordinateRight, blockKind: .leaf)
                 blocks.append(blockRight)
                 
                 /// bottom leaves
                 for (x, y) in [(-1, 1), (0, 1), (1, 1)] {
                     let coordinate = Coordinate(row: trunk.1 + y, column: trunk.0 + x, levitation: levitation)
-                    let block = Block(coordinate: coordinate, item: .leaf)
+                    let block = Block(coordinate: coordinate, blockKind: .leaf)
                     blocks.append(block)
                 }
             case 6:
                 /// second layer of leaves, in cross shape
                 for (x, y) in [(0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)] {
                     let coordinateRight = Coordinate(row: trunk.1 + y, column: trunk.0 + x, levitation: levitation)
-                    let block = Block(coordinate: coordinateRight, item: .leaf)
+                    let block = Block(coordinate: coordinateRight, blockKind: .leaf)
                     blocks.append(block)
                 }
             case 7:
                 /// top leaf block
                 let coordinate = Coordinate(row: trunk.1, column: trunk.0, levitation: levitation)
-                let block = Block(coordinate: coordinate, item: .leaf)
+                let block = Block(coordinate: coordinate, blockKind: .leaf)
                 blocks.append(block)
             default:
                 /// just a log
                 let coordinate = Coordinate(row: trunk.1, column: trunk.0, levitation: levitation)
-                let block = Block(coordinate: coordinate, item: .log)
+                let block = Block(coordinate: coordinate, blockKind: .log)
                 blocks.append(block)
             }
         }
@@ -197,6 +197,39 @@ struct World {
         
         return world
     }()
+}
+
+enum BlockKind: String, CaseIterable {
+    case dirt
+    case grass
+    case log
+    case stone
+    case leaf
+    case water
+    case waterSource
+    
+    var texture: Texture {
+        switch self {
+        case .dirt:
+            return .image("dirt")
+        case .grass:
+            return .differentSides(top: "grass_block_top", sides: "grass_block_side")
+        case .log:
+            return .differentSides(top: "oak_log_top", sides: "oak_log")
+        case .stone:
+            return .image("stone")
+        case .leaf:
+            return .image("oak_leaves")
+        case .water:
+            return .water
+        case .waterSource:
+            return .waterSource
+        }
+    }
+    
+    var isWater: Bool {
+        self == .water || self == .waterSource
+    }
 }
 
 enum Item: String, CaseIterable {
@@ -211,55 +244,73 @@ enum Item: String, CaseIterable {
     case bucket
     case beef
     
-    var texture: Texture {
-        switch self {
-        case .dirt:
-            return .init(itemPreview: nil, blockTop: "dirt", blockSide: "dirt")
-        case .grass:
-            return .init(itemPreview: nil, blockTop: "grass_block_top", blockSide: "grass_block_side")
-        case .log:
-            return .init(itemPreview: nil, blockTop: "oak_log_top", blockSide: "oak_log")
-        case .stone:
-            return .init(itemPreview: nil, blockTop: "stone", blockSide: "stone")
-        case .leaf:
-            return .init(itemPreview: nil, blockTop: "oak_leaves", blockSide: "oak_leaves")
-        case .pick:
-            return .init(itemPreview: "diamond_pickaxe", blockTop: nil, blockSide: nil)
-        case .sword:
-            return .init(itemPreview: "diamond_sword", blockTop: nil, blockSide: nil)
-        case .bucket:
-            return .init(itemPreview: "water_bucket", blockTop: nil, blockSide: nil)
-        case .beef:
-            return .init(itemPreview: "cooked_beef", blockTop: nil, blockSide: nil)
-        }
+    enum Preview {
+        case image(String)
+        case blockView(BlockView)
     }
     
-    var previewBlockView: BlockView? {
+    var preview: Preview {
         switch self {
+        case .pick:
+            return .image("diamond_pickaxe")
+        case .sword:
+            return .image("diamond_sword")
+        case .bucket:
+            return .image("water_bucket")
+        case .beef:
+            return .image("cooked_beef")
         case .dirt, .grass, .log, .stone, .leaf:
-            return BlockView(
-                tilt: 1,
-                length: 20,
-                levitation: 0,
-                block: World.Block(
-                    coordinate: .init( /// coordinate is ignored
-                        row: 0,
-                        column: 0,
-                        levitation: 0
-                    ),
-                    item: self
+            if let associatedBlockKind {
+                return .blockView(
+                    BlockView(
+                        tilt: 1,
+                        length: 20,
+                        levitation: 0,
+                        block: World.Block(
+                            coordinate: .init( /// coordinate is ignored
+                                row: 0,
+                                column: 0,
+                                levitation: 0
+                            ),
+                            blockKind: associatedBlockKind
+                        )
+                    )
                 )
-            )
-        default:
+            }
+        }
+        
+        fatalError("No preview for \(self).")
+    }
+    
+    var associatedBlockKind: BlockKind? {
+        switch self {
+        case .dirt:
+            return .dirt
+        case .grass:
+            return .grass
+        case .log:
+            return .log
+        case .stone:
+            return .stone
+        case .leaf:
+            return .leaf
+        case .pick:
+            return nil
+        case .sword:
+            return nil
+        case .bucket:
+            return .waterSource
+        case .beef:
             return nil
         }
     }
 }
 
-struct Texture {
-    var itemPreview: String?
-    var blockTop: String?
-    var blockSide: String?
+enum Texture {
+    case differentSides(top: String, sides: String)
+    case image(String)
+    case water
+    case waterSource
 }
 
 struct ContentView: View {
@@ -324,11 +375,11 @@ struct ContentView: View {
             
         } else {
             /// only allow blocks (items that have a block preview) to be placed, not other items
-            guard selectedItem.previewBlockView != nil else { return }
+            guard let associatedBlockKind = selectedItem.associatedBlockKind else { return }
             
             var blocks = world.blocks
             DispatchQueue.global().async {
-                let block = World.Block(coordinate: coordinate, item: selectedItem)
+                let block = World.Block(coordinate: coordinate, blockKind: associatedBlockKind)
                 blocks.append(block)
                 blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
                 
@@ -353,7 +404,7 @@ struct ContentView: View {
             }) {
                 let waterHeight = CGFloat(coordinate.levitation - surface.coordinate.levitation) - (0.2 + CGFloat(depth) * 0.2) /// make the extrusion larger
                 let waterAboveSurfaceCoordinate = World.Coordinate(row: coordinate.row, column: coordinate.column, levitation: surface.coordinate.levitation + 1)
-                let waterAboveSurface = World.Block(coordinate: waterAboveSurfaceCoordinate, item: .bucket, extrusionPercentage: waterHeight)
+                let waterAboveSurface = World.Block(coordinate: waterAboveSurfaceCoordinate, blockKind: .water, extrusionPercentage: waterHeight)
                 existingBlocks.append(waterAboveSurface)
                 
                 existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterAboveSurfaceCoordinate, depth: 0)
@@ -361,7 +412,7 @@ struct ContentView: View {
         }
         
         let coordinateUnderneath = World.Coordinate(row: coordinate.row, column: coordinate.column, levitation: coordinate.levitation - 1)
-        if existingBlocks.contains(where: { $0.coordinate == coordinateUnderneath && $0.item != .bucket }) {
+        if existingBlocks.contains(where: { $0.coordinate == coordinateUnderneath && !$0.blockKind.isWater }) {
             if depth == 0 {
                 /// check if current block is on a surface
                 if existingBlocks.contains(where: {
@@ -448,7 +499,7 @@ struct ContentView: View {
                         KeyboardButton(key: .reset) {
                             var blocks = world.blocks
                             DispatchQueue.global().async {
-                                blocks = blocks.filter { $0.item != .bucket }
+                                blocks = blocks.filter { !$0.blockKind.isWater }
                                 
                                 DispatchQueue.main.async {
                                     world.blocks = blocks
@@ -589,14 +640,15 @@ struct ItemView: View {
     var body: some View {
         Color.black.opacity(0.4)
             .overlay {
-                if let itemPreview = item.texture.itemPreview {
-                    Image(itemPreview)
+                switch item.preview {
+                case let .image(image):
+                    Image(image)
                         .interpolation(.none)
                         .resizable()
                         .padding(7)
-                } else if let previewBlockView = item.previewBlockView {
+                case let .blockView(blockView):
                     PrismCanvas(tilt: 1) {
-                        previewBlockView
+                        blockView
                     }
                     .scaleEffect(y: 0.69)
                     .offset(y: 10)
@@ -632,6 +684,67 @@ struct BlockView: View {
     var leftPressed: (() -> Void)?
     var rightPressed: (() -> Void)?
     
+    var top: some View {
+        Group {
+            switch block.blockKind.texture {
+            case let .differentSides(top, _):
+                Image(top)
+                    .interpolation(.none)
+                    .resizable()
+            case let .image(image):
+                Image(image)
+                    .interpolation(.none)
+                    .resizable()
+            case .water:
+                Color.blue.opacity(0.55)
+            case .waterSource:
+                Color.blue.opacity(0.95)
+            }
+        }
+    }
+    
+    var left: some View {
+        Group {
+            switch block.blockKind.texture {
+            case let .differentSides(_, sides):
+                Image(sides)
+                    .interpolation(.none)
+                    .resizable()
+                    .brightness(-0.1)
+            case let .image(image):
+                Image(image)
+                    .interpolation(.none)
+                    .resizable()
+                    .brightness(-0.1)
+            case .water:
+                Color.blue.opacity(0.55)
+            case .waterSource:
+                Color.blue.opacity(0.95)
+            }
+        }
+    }
+    
+    var right: some View {
+        Group {
+            switch block.blockKind.texture {
+            case let .differentSides(_, sides):
+                Image(sides)
+                    .interpolation(.none)
+                    .resizable()
+                    .brightness(-0.2)
+            case let .image(image):
+                Image(image)
+                    .interpolation(.none)
+                    .resizable()
+                    .brightness(-0.2)
+            case .water:
+                Color.blue.opacity(0.55)
+            case .waterSource:
+                Color.blue.opacity(0.95)
+            }
+        }
+    }
+    
     var body: some View {
         PrismView(
             tilt: tilt,
@@ -640,62 +753,34 @@ struct BlockView: View {
             levitation: levitation,
             shadowOpacity: 0.25
         ) {
-            if let top = block.item.texture.blockTop ?? block.item.texture.blockSide {
-                if let topPressed {
-                    Image(top)
-                        .interpolation(.none)
-                        .resizable()
-                        .onTapGesture {
-                            topPressed()
-                        }
-                } else {
-                    Image(top)
-                        .interpolation(.none)
-                        .resizable()
-                }
-                        
-            } else if block.item == .bucket {
-                Color.blue.opacity(0.55)
+            if let topPressed {
+                top
+                    .onTapGesture {
+                        topPressed()
+                    }
+            } else {
+                top
             }
+            
         } left: {
-            if let side = block.item.texture.blockSide {
-                if let leftPressed {
-                    Image(side)
-                        .interpolation(.none)
-                        .resizable()
-                        .brightness(-0.1)
-                        .onTapGesture {
-                            leftPressed()
-                        }
-                } else {
-                    Image(side)
-                        .interpolation(.none)
-                        .resizable()
-                        .brightness(-0.1)
-                }
-            } else if block.item == .bucket {
-                Color.blue.opacity(0.35)
+            if let leftPressed {
+                left
+                    .onTapGesture {
+                        leftPressed()
+                    }
+            } else {
+                left
             }
         } right: {
-            if let side = block.item.texture.blockSide {
-                if let rightPressed {
-                    Image(side)
-                        .interpolation(.none)
-                        .resizable()
-                        .brightness(-0.2)
-                        .onTapGesture {
-                            rightPressed()
-                        }
-                } else {
-                    Image(side)
-                        .interpolation(.none)
-                        .resizable()
-                        .brightness(-0.2)
-                }
-            } else if block.item == .bucket {
-                Color.blue.opacity(0.2)
+            if let rightPressed {
+                right
+                    .onTapGesture {
+                        rightPressed()
+                    }
+            } else {
+                right
             }
         }
-        .allowsHitTesting(block.item != .bucket)
+        .allowsHitTesting(!block.blockKind.isWater)
     }
 }

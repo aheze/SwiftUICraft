@@ -233,8 +233,6 @@ struct ContentView: View {
         
         let slot = World.Slot(coordinate: coordinate, item: selectedItem)
         world.slots.append(slot)
-        
-        print("addin: \(slot)")
     }
     
     var game: some View {
@@ -424,20 +422,35 @@ struct Block: View {
             size: .init(width: length, height: length),
             extrusion: length,
             levitation: levitation,
-            shadowOpacity: 0
+            shadowOpacity: 0.25
         ) {
             if let top = item.texture.blockTop ?? item.texture.blockSide {
-                Button {} label: {
+                if let topPressed {
+                    Image(top)
+                        .interpolation(.none)
+                        .resizable()
+                        .onTapGesture {
+                            topPressed()
+                        }
+                } else {
                     Image(top)
                         .interpolation(.none)
                         .resizable()
                 }
+                        
             } else {
                 Color.clear
             }
         } left: {
             if let side = item.texture.blockSide {
-                Button {} label: {
+                if let leftPressed {
+                    Image(side)
+                        .interpolation(.none)
+                        .resizable()
+                        .onTapGesture {
+                            leftPressed()
+                        }
+                } else {
                     Image(side)
                         .interpolation(.none)
                         .resizable()
@@ -448,7 +461,14 @@ struct Block: View {
             }
         } right: {
             if let side = item.texture.blockSide {
-                Button {} label: {
+                if let rightPressed {
+                    Image(side)
+                        .interpolation(.none)
+                        .resizable()
+                        .onTapGesture {
+                            rightPressed()
+                        }
+                } else {
                     Image(side)
                         .interpolation(.none)
                         .resizable()

@@ -390,8 +390,8 @@ struct ContentView: View {
         }
     }
     
-    let waterSpread = 1
     func modifyWorldForWater(existingBlocks: [World.Block], at coordinate: World.Coordinate, depth: Int) -> [World.Block] {
+        var waterSpread = 5
         var existingBlocks = existingBlocks
         
         /// add a block if there's none there currently
@@ -404,7 +404,7 @@ struct ContentView: View {
             }) {
                 let waterHeight = CGFloat(coordinate.levitation - surface.coordinate.levitation) - (0.2 + CGFloat(depth) * 0.2) /// make the extrusion larger
                 let waterAboveSurfaceCoordinate = World.Coordinate(row: coordinate.row, column: coordinate.column, levitation: surface.coordinate.levitation + 1)
-                let waterAboveSurface = World.Block(coordinate: waterAboveSurfaceCoordinate, blockKind: .water, extrusionPercentage: waterHeight)
+                let waterAboveSurface = World.Block(coordinate: waterAboveSurfaceCoordinate, blockKind: .water, extrusionPercentage: max(0, waterHeight))
                 existingBlocks.append(waterAboveSurface)
                 
                 existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterAboveSurfaceCoordinate, depth: 0)
@@ -412,25 +412,44 @@ struct ContentView: View {
         }
         
         let coordinateUnderneath = World.Coordinate(row: coordinate.row, column: coordinate.column, levitation: coordinate.levitation - 1)
-        if existingBlocks.contains(where: { $0.coordinate == coordinateUnderneath && !$0.blockKind.isWater }) {
-            if depth == 0 {
-                /// check if current block is on a surface
-                if existingBlocks.contains(where: {
-                    $0.coordinate.row == coordinate.row
-                        && $0.coordinate.column == coordinate.column
-                        && $0.coordinate.levitation == coordinate.levitation - 1
-                }) {
-                    for index in 0...waterSpread {
-                        /// draw a diamond-shaped ring of blocks
-                        for column in -index...index {
-                            let rowOffset = index - abs(column)
-                            let waterCoordinate = World.Coordinate(row: coordinate.row + rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
-                            existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterCoordinate, depth: depth + 1 + index)
+        
+        if
+            depth == 0, /// only spread if the depth is 0 and the block underneath is land
+            existingBlocks.contains(where: { $0.coordinate == coordinateUnderneath && !$0.blockKind.isWater })
+        {
+            /// check if current block is on a surface
+            if existingBlocks.contains(where: {
+                $0.coordinate == coordinateUnderneath
+            }) {
+                let surroundingOffsets: [(x: Int, y: Int)] = [
+                    (-1, -1), (0, -1), (1, -1),
+                    (-1, 0), (1, 0),
+                    (-1, 1), (0, 1), (1, 1),
+                ]
+                
+                let surroundingCoordinates = surroundingOffsets.map {
+                    World.Coordinate(row: coordinateUnderneath.row + $0.y, column: coordinateUnderneath.column + $0.x, levitation: coordinateUnderneath.levitation)
+                }
+                
+                let surroundingSurfaces = surroundingCoordinates.filter { surroundingCoordinate in
+                    existingBlocks.contains(where: { $0.coordinate == surroundingCoordinate })
+                }
+                
+                if surroundingSurfaces.count < 5 {
+                    waterSpread = 1
+                }
+                
+                for index in 0...waterSpread {
+                    /// draw a diamond-shaped ring of blocks
+                    for column in -index...index {
+                        let rowOffset = index - abs(column)
+                        let waterCoordinate = World.Coordinate(row: coordinate.row + rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
+                        
+                        existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterCoordinate, depth: depth + index + 1)
                             
-                            if column != -index {
-                                let waterCoordinate = World.Coordinate(row: coordinate.row - rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
-                                existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterCoordinate, depth: depth + 1 + index)
-                            }
+                        if column != -index {
+                            let waterCoordinate = World.Coordinate(row: coordinate.row - rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
+                            existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterCoordinate, depth: depth + index + 1)
                         }
                     }
                 }

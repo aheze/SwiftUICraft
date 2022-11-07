@@ -253,8 +253,8 @@ struct ContentView: View {
                     game
                         .offset(y: 120)
                 }
-                .padding(.horizontal, -300)
-                .padding(.vertical, -400)
+                .padding(.horizontal, -200)
+                .padding(.vertical, -100)
                 .drawingGroup()
                 .offset(offset)
                 .background {
@@ -344,6 +344,15 @@ struct ContentView: View {
     
     var controls: some View {
         VStack {
+            VStack(spacing: 2) {
+                Text("SWIFTUICRAFT")
+                    .font(.system(size: 40, weight: .heavy, design: .serif))
+                
+                Text("@aheze0")
+                    .font(.system(size: 16, weight: .heavy, design: .serif))
+                    .opacity(0.25)
+            }
+            
             Spacer()
             
             HStack {

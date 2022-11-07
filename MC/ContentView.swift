@@ -52,7 +52,7 @@ enum KeyboardKey {
 struct World {
     var width = 15
     var height = 6
-    var slots = [Slot]()
+    var blocks = [Block]()
     
     struct Coordinate: Hashable, Comparable {
         var row: Int
@@ -79,19 +79,21 @@ struct World {
         }
     }
     
-    struct Slot: Identifiable {
+    /// represents a chunk in the world
+    struct Block: Identifiable {
         var id: Coordinate {
             coordinate
         }
 
         var coordinate: Coordinate
         var item: Item
+        var extrusionPercentage = CGFloat(1)
     }
     
     static let defaultWorld: Self = {
         let width = 15
         let height = 6
-        var slots = [Slot]()
+        var blocks = [Block]()
         
         /// base dirt layer
         for row in 0..<height {
@@ -99,8 +101,8 @@ struct World {
                 let shouldBeDirt = (column - (height - row)) < 3
                 
                 let coordinate = Coordinate(row: row, column: column, levitation: 0)
-                let slot = Slot(coordinate: coordinate, item: shouldBeDirt ? .dirt : .grass)
-                slots.append(slot)
+                let block = Block(coordinate: coordinate, item: shouldBeDirt ? .dirt : .grass)
+                blocks.append(block)
             }
         }
         
@@ -111,8 +113,8 @@ struct World {
                 
                 if shouldAdd {
                     let coordinate = Coordinate(row: row, column: column, levitation: 1)
-                    let slot = Slot(coordinate: coordinate, item: .dirt)
-                    slots.append(slot)
+                    let block = Block(coordinate: coordinate, item: .dirt)
+                    blocks.append(block)
                 }
             }
         }
@@ -124,8 +126,8 @@ struct World {
                 
                 if shouldAdd {
                     let coordinate = Coordinate(row: row, column: column, levitation: 2)
-                    let slot = Slot(coordinate: coordinate, item: .grass)
-                    slots.append(slot)
+                    let block = Block(coordinate: coordinate, item: .grass)
+                    blocks.append(block)
                 }
             }
         }
@@ -133,8 +135,8 @@ struct World {
         /// fill in some more grass blocks at the bottom
         for (x, y) in [(2, 4), (1, 5), (2, 5), (3, 5)] {
             let coordinate = Coordinate(row: y, column: x, levitation: 2)
-            let slot = Slot(coordinate: coordinate, item: .grass)
-            slots.append(slot)
+            let block = Block(coordinate: coordinate, item: .grass)
+            blocks.append(block)
         }
         
         /// tree
@@ -145,50 +147,50 @@ struct World {
                 /// first layer leaves
                 for (x, y) in [(-1, -1), (0, -1), (1, -1)] {
                     let coordinate = Coordinate(row: trunk.1 + y, column: trunk.0 + x, levitation: levitation)
-                    let slot = Slot(coordinate: coordinate, item: .leaf)
-                    slots.append(slot)
+                    let block = Block(coordinate: coordinate, item: .leaf)
+                    blocks.append(block)
                 }
                 
                 let coordinateLeft = Coordinate(row: trunk.1, column: trunk.0 - 1, levitation: levitation)
-                let slotLeft = Slot(coordinate: coordinateLeft, item: .leaf)
-                slots.append(slotLeft)
+                let blockLeft = Block(coordinate: coordinateLeft, item: .leaf)
+                blocks.append(blockLeft)
                 
                 let coordinate = Coordinate(row: trunk.1, column: trunk.0, levitation: levitation)
-                let slot = Slot(coordinate: coordinate, item: .log)
-                slots.append(slot)
+                let block = Block(coordinate: coordinate, item: .log)
+                blocks.append(block)
                 
                 let coordinateRight = Coordinate(row: trunk.1, column: trunk.0 + 1, levitation: levitation)
-                let slotRight = Slot(coordinate: coordinateRight, item: .leaf)
-                slots.append(slotRight)
+                let blockRight = Block(coordinate: coordinateRight, item: .leaf)
+                blocks.append(blockRight)
                 
                 /// bottom leaves
                 for (x, y) in [(-1, 1), (0, 1), (1, 1)] {
                     let coordinate = Coordinate(row: trunk.1 + y, column: trunk.0 + x, levitation: levitation)
-                    let slot = Slot(coordinate: coordinate, item: .leaf)
-                    slots.append(slot)
+                    let block = Block(coordinate: coordinate, item: .leaf)
+                    blocks.append(block)
                 }
             case 6:
                 /// second layer of leaves, in cross shape
                 for (x, y) in [(0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)] {
                     let coordinateRight = Coordinate(row: trunk.1 + y, column: trunk.0 + x, levitation: levitation)
-                    let slot = Slot(coordinate: coordinateRight, item: .leaf)
-                    slots.append(slot)
+                    let block = Block(coordinate: coordinateRight, item: .leaf)
+                    blocks.append(block)
                 }
             case 7:
                 /// top leaf block
                 let coordinate = Coordinate(row: trunk.1, column: trunk.0, levitation: levitation)
-                let slot = Slot(coordinate: coordinate, item: .leaf)
-                slots.append(slot)
+                let block = Block(coordinate: coordinate, item: .leaf)
+                blocks.append(block)
             default:
                 /// just a log
                 let coordinate = Coordinate(row: trunk.1, column: trunk.0, levitation: levitation)
-                let slot = Slot(coordinate: coordinate, item: .log)
-                slots.append(slot)
+                let block = Block(coordinate: coordinate, item: .log)
+                blocks.append(block)
             }
         }
         
-        slots = slots.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
-        let world = World(slots: slots)
+        blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
+        let world = World(blocks: blocks)
         
         return world
     }()
@@ -229,10 +231,10 @@ enum Item: String, CaseIterable {
         }
     }
     
-    var previewBlock: Block? {
+    var previewBlockView: BlockView? {
         switch self {
         case .dirt, .grass, .log, .stone, .leaf:
-            return Block(tilt: 1, length: 20, levitation: 0, item: self)
+            return BlockView(tilt: 1, length: 20, levitation: 0, item: self)
         default:
             return nil
         }
@@ -294,17 +296,32 @@ struct ContentView: View {
     }
     
     func addBlock(at coordinate: World.Coordinate) {
-        /// only allow blocks to be placed, not other items
-        guard selectedItem.previewBlock != nil else { return }
-        
-        var slots = world.slots
-        DispatchQueue.global().async {
-            let slot = World.Slot(coordinate: coordinate, item: selectedItem)
-            slots.append(slot)
-            slots = slots.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
+        if selectedItem == .bucket {
+            print("Water!")
+            var blocks = world.blocks
+            DispatchQueue.global().async {
+                let block = World.Block(coordinate: coordinate, item: selectedItem)
+                blocks.append(block)
+                blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
+                
+                DispatchQueue.main.async {
+                    world.blocks = blocks
+                }
+            }
             
-            DispatchQueue.main.async {
-                world.slots = slots
+        } else {
+            /// only allow blocks (items that have a block preview) to be placed, not other items
+            guard selectedItem.previewBlockView != nil else { return }
+            
+            var blocks = world.blocks
+            DispatchQueue.global().async {
+                let block = World.Block(coordinate: coordinate, item: selectedItem)
+                blocks.append(block)
+                blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
+                
+                DispatchQueue.main.async {
+                    world.blocks = blocks
+                }
             }
         }
     }
@@ -319,37 +336,37 @@ struct ContentView: View {
             PrismColorView(tilt: tilt, size: size, extrusion: 20, levitation: -20, color: Color.blue.opacity(0.5))
                 .overlay {
                     ZStack(alignment: .topLeading) {
-                        ForEach(world.slots) { slot in
-                            Block(
+                        ForEach(world.blocks) { block in
+                            BlockView(
                                 tilt: tilt,
                                 length: blockLength,
-                                levitation: CGFloat(slot.coordinate.levitation) * blockLength,
-                                item: slot.item
+                                levitation: CGFloat(block.coordinate.levitation) * blockLength,
+                                item: block.item
                             ) /** topPressed */ {
                                 let coordinate = World.Coordinate(
-                                    row: slot.coordinate.row,
-                                    column: slot.coordinate.column,
-                                    levitation: slot.coordinate.levitation + 1
+                                    row: block.coordinate.row,
+                                    column: block.coordinate.column,
+                                    levitation: block.coordinate.levitation + 1
                                 )
                                 addBlock(at: coordinate)
                             } leftPressed: {
                                 let coordinate = World.Coordinate(
-                                    row: slot.coordinate.row + 1,
-                                    column: slot.coordinate.column,
-                                    levitation: slot.coordinate.levitation
+                                    row: block.coordinate.row + 1,
+                                    column: block.coordinate.column,
+                                    levitation: block.coordinate.levitation
                                 )
                                 addBlock(at: coordinate)
                             } rightPressed: {
                                 let coordinate = World.Coordinate(
-                                    row: slot.coordinate.row,
-                                    column: slot.coordinate.column + 1,
-                                    levitation: slot.coordinate.levitation
+                                    row: block.coordinate.row,
+                                    column: block.coordinate.column + 1,
+                                    levitation: block.coordinate.levitation
                                 )
                                 addBlock(at: coordinate)
                             }
                             .offset(
-                                x: CGFloat(slot.coordinate.column) * blockLength,
-                                y: CGFloat(slot.coordinate.row) * blockLength
+                                x: CGFloat(block.coordinate.column) * blockLength,
+                                y: CGFloat(block.coordinate.row) * blockLength
                             )
                         }
                     }
@@ -373,20 +390,20 @@ struct ContentView: View {
                             scale += 0.1
                         }
                     }
-                    slot
+                    block
                 }
                     
                 Color.clear.gridCellUnsizedAxes(.horizontal)
                     .frame(height: 4)
                     
                 GridRow {
-                    slot
+                    block
                     KeyboardButton(key: .direction(.up)) {
                         withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                             offset.height += 100
                         }
                     }
-                    slot
+                    block
                 }
                 GridRow {
                     KeyboardButton(key: .direction(.left)) {
@@ -406,13 +423,13 @@ struct ContentView: View {
                     }
                 }
                 GridRow {
-                    slot
+                    block
                     KeyboardButton(key: .direction(.down)) {
                         withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                             offset.height -= 100
                         }
                     }
-                    slot
+                    block
                 }
             }
                 
@@ -460,7 +477,7 @@ struct ContentView: View {
         .padding(.vertical, 20)
     }
 
-    var slot: some View {
+    var block: some View {
         Color.clear.gridCellUnsizedAxes([.vertical, .horizontal])
     }
 }
@@ -502,9 +519,9 @@ struct ItemView: View {
                         .interpolation(.none)
                         .resizable()
                         .padding(7)
-                } else if let block = item.previewBlock {
+                } else if let previewBlockView = item.previewBlockView {
                     PrismCanvas(tilt: 1) {
-                        block
+                        previewBlockView
                     }
                     .scaleEffect(y: 0.69)
                     .offset(y: 10)
@@ -530,7 +547,7 @@ struct ItemView: View {
     }
 }
 
-struct Block: View {
+struct BlockView: View {
     var tilt: CGFloat
     var length: CGFloat
     var levitation: CGFloat
@@ -562,8 +579,8 @@ struct Block: View {
                         .resizable()
                 }
                         
-            } else {
-                Color.clear
+            } else if item == .bucket {
+                Color.blue
             }
         } left: {
             if let side = item.texture.blockSide {
@@ -581,8 +598,8 @@ struct Block: View {
                         .resizable()
                         .brightness(-0.1)
                 }
-            } else {
-                Color.clear
+            } else if item == .bucket {
+                Color.blue
             }
         } right: {
             if let side = item.texture.blockSide {
@@ -600,8 +617,8 @@ struct Block: View {
                         .resizable()
                         .brightness(-0.2)
                 }
-            } else {
-                Color.clear
+            } else if item == .bucket {
+                Color.blue
             }
         }
     }

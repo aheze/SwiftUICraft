@@ -343,14 +343,12 @@ struct ContentView: View {
         }
     }
     
-    let waterSpread = 3
+    let waterSpread = 1
     func modifyWorldForWater(existingBlocks: [World.Block], at coordinate: World.Coordinate, depth: Int) -> [World.Block] {
         var existingBlocks = existingBlocks
         
-        /// base case - a block is blocking more water flow
-        if existingBlocks.contains(where: { $0.coordinate == coordinate }) {
-            return existingBlocks
-        } else {
+        /// add a block if there's none there currently
+        if !existingBlocks.contains(where: { $0.coordinate == coordinate }) {
             /// otherwise, add water and sink it to the surface
             if let surface = existingBlocks.last(where: {
                 $0.coordinate.row == coordinate.row
@@ -361,27 +359,31 @@ struct ContentView: View {
                 let waterAboveSurfaceCoordinate = World.Coordinate(row: coordinate.row, column: coordinate.column, levitation: surface.coordinate.levitation + 1)
                 let waterAboveSurface = World.Block(coordinate: waterAboveSurfaceCoordinate, item: .bucket, extrusionPercentage: waterHeight)
                 existingBlocks.append(waterAboveSurface)
+                
                 existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterAboveSurfaceCoordinate, depth: 0)
             }
         }
         
-        if depth == 0 {
-            /// check if current block is on a surface
-            if existingBlocks.contains(where: {
-                $0.coordinate.row == coordinate.row
-                    && $0.coordinate.column == coordinate.column
-                    && $0.coordinate.levitation == coordinate.levitation - 1
-            }) {
-                for index in 0...waterSpread {
-                    /// draw a diamond-shaped ring of blocks
-                    for column in -index...index {
-                        let rowOffset = index - abs(column)
-                        let waterCoordinate = World.Coordinate(row: coordinate.row + rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
-                        existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterCoordinate, depth: depth + 1 + index)
-                        
-                        if column != -index {
-                            let waterCoordinate = World.Coordinate(row: coordinate.row - rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
+        let coordinateUnderneath = World.Coordinate(row: coordinate.row, column: coordinate.column, levitation: coordinate.levitation - 1)
+        if existingBlocks.contains(where: { $0.coordinate == coordinateUnderneath && $0.item != .bucket }) {
+            if depth == 0 {
+                /// check if current block is on a surface
+                if existingBlocks.contains(where: {
+                    $0.coordinate.row == coordinate.row
+                        && $0.coordinate.column == coordinate.column
+                        && $0.coordinate.levitation == coordinate.levitation - 1
+                }) {
+                    for index in 0...waterSpread {
+                        /// draw a diamond-shaped ring of blocks
+                        for column in -index...index {
+                            let rowOffset = index - abs(column)
+                            let waterCoordinate = World.Coordinate(row: coordinate.row + rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
                             existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterCoordinate, depth: depth + 1 + index)
+                            
+                            if column != -index {
+                                let waterCoordinate = World.Coordinate(row: coordinate.row - rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
+                                existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterCoordinate, depth: depth + 1 + index)
+                            }
                         }
                     }
                 }

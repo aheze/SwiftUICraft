@@ -231,8 +231,15 @@ struct Texture {
 struct ContentView: View {
     @State var world = World.defaultWorld
     @State var selectedItem = Item.dirt
-    @State var tilt = CGFloat(0.3)
     @State var offset = CGSize.zero
+    
+    @State var savedTranslation = CGFloat(0)
+    @State var additionalTranslation = CGFloat(0)
+    var tilt: CGFloat {
+        let translation = savedTranslation + additionalTranslation
+        let tilt = 0.3 - (translation / 100)
+        return tilt
+    }
     
     let blockLength = CGFloat(50)
     
@@ -247,7 +254,7 @@ struct ContentView: View {
                         .offset(y: 120)
                 }
                 .padding(.horizontal, -300)
-                .padding(.vertical, -200)
+                .padding(.vertical, -400)
                 .drawingGroup()
                 .offset(offset)
                 .background {
@@ -256,6 +263,16 @@ struct ContentView: View {
                         .background(Color.white)
                 }
                 .ignoresSafeArea()
+                .simultaneousGesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            additionalTranslation = value.translation.width
+                        }
+                        .onEnded { value in
+                            savedTranslation += additionalTranslation
+                            additionalTranslation = 0
+                        }
+                )
         }
     }
     

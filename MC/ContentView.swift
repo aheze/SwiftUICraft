@@ -99,7 +99,7 @@ struct World {
         }
         
         /// tree
-        let trunk = (12, 2)
+        let trunk = (11, 2)
         for levitation in 1..<8 {
             switch levitation {
             case 5:
@@ -229,11 +229,12 @@ struct ContentView: View {
     
     var game: some View {
         PrismCanvas(tilt: tilt) {
-            Color.black.opacity(0.5)
-                .frame(
-                    width: CGFloat(world.width) * blockLength,
-                    height: CGFloat(world.height) * blockLength
-                )
+            let size = CGSize(
+                width: CGFloat(world.width) * blockLength,
+                height: CGFloat(world.height) * blockLength
+            )
+            
+            PrismColorView(tilt: tilt, size: size, extrusion: 20, levitation: -20, color: Color.blue.opacity(0.5))
                 .overlay {
                     ZStack(alignment: .topLeading) {
                         ForEach(world.slots) { slot in
@@ -341,7 +342,7 @@ struct ItemView: View {
     var item: Item
     
     var body: some View {
-        Color.black.opacity(0.1)
+        Color.black.opacity(0.4)
             .overlay {
                 if let itemPreview = item.texture.itemPreview {
                     Image(itemPreview)
@@ -358,13 +359,13 @@ struct ItemView: View {
             }
             .overlay {
                 Rectangle()
-                    .strokeBorder(Color.black, lineWidth: 6)
+                    .strokeBorder(Color.white, lineWidth: 6)
                     .opacity(0.1)
             }
             .overlay {
                 Rectangle()
                     .strokeBorder(Color.white, lineWidth: 2)
-                    .opacity(0.3)
+                    .opacity(0.5)
                     .padding(2)
             }
             .overlay {

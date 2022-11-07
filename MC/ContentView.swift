@@ -370,7 +370,7 @@ struct ContentView: View {
         if selectedItem == .bucket {
             var blocks = world.blocks
             DispatchQueue.global().async {
-                blocks = modifyWorldForWater(existingBlocks: blocks, at: coordinate, depth: 0)
+                blocks = modifyWorldForWater(existingBlocks: blocks, at: coordinate, depth: 0, isInitial: true)
                 blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
                 blocks = blocks.uniqued()
                 
@@ -396,7 +396,7 @@ struct ContentView: View {
         }
     }
     
-    func modifyWorldForWater(existingBlocks: [Block], at coordinate: Coordinate, depth: Int) -> [Block] {
+    func modifyWorldForWater(existingBlocks: [Block], at coordinate: Coordinate, depth: Int, isInitial: Bool = false) -> [Block] {
         var waterSpread = 5
         var existingBlocks = existingBlocks
         
@@ -410,9 +410,8 @@ struct ContentView: View {
             }) {
                 let waterHeight = CGFloat(coordinate.levitation - surface.coordinate.levitation) - (0.2 + CGFloat(depth) * 0.2) /// make the extrusion larger
                 let waterAboveSurfaceCoordinate = Coordinate(row: coordinate.row, column: coordinate.column, levitation: surface.coordinate.levitation + 1)
-                let waterAboveSurface = Block(coordinate: waterAboveSurfaceCoordinate, blockKind: .water, extrusionPercentage: max(0, waterHeight))
+                let waterAboveSurface = Block(coordinate: waterAboveSurfaceCoordinate, blockKind: isInitial ? .waterSource : .water, extrusionPercentage: max(0, waterHeight))
                 existingBlocks.append(waterAboveSurface)
-                
                 existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterAboveSurfaceCoordinate, depth: 0)
             }
         }
@@ -721,9 +720,9 @@ struct BlockView: View {
                     .interpolation(.none)
                     .resizable()
             case .water:
-                Color.blue.opacity(0.55)
+                Color.blue.opacity(0.4)
             case .waterSource:
-                Color.blue.opacity(0.95)
+                Color.blue.brightness(-0.1).opacity(0.8)
             }
         }
     }
@@ -742,9 +741,9 @@ struct BlockView: View {
                     .resizable()
                     .brightness(-0.1)
             case .water:
-                Color.blue.opacity(0.55)
+                Color.blue.opacity(0.3)
             case .waterSource:
-                Color.blue.opacity(0.95)
+                Color.blue.brightness(-0.1).opacity(0.55)
             }
         }
     }
@@ -763,9 +762,9 @@ struct BlockView: View {
                     .resizable()
                     .brightness(-0.2)
             case .water:
-                Color.blue.opacity(0.55)
+                Color.blue.opacity(0.2)
             case .waterSource:
-                Color.blue.opacity(0.95)
+                Color.blue.brightness(-0.1).opacity(0.45)
             }
         }
     }

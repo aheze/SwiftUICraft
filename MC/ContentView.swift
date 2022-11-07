@@ -377,63 +377,65 @@ struct ContentView: View {
     }
     
     var controls: some View {
-        HStack {
-            Grid {
-                GridRow {
-                    KeyboardButton(key: .zoomOut) {
-                        withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
-                            scale -= 0.1
-                        }
-                    }
-                    KeyboardButton(key: .zoomIn) {
-                        withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
-                            scale += 0.1
-                        }
-                    }
-                    block
-                }
-                    
-                Color.clear.gridCellUnsizedAxes(.horizontal)
-                    .frame(height: 4)
-                    
-                GridRow {
-                    block
-                    KeyboardButton(key: .direction(.up)) {
-                        withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
-                            offset.height += 100
-                        }
-                    }
-                    block
-                }
-                GridRow {
-                    KeyboardButton(key: .direction(.left)) {
-                        withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
-                            offset.width += 100
-                        }
-                    }
-                    KeyboardButton(key: .reset) {
-                        withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
-                            offset = .zero
-                        }
-                    }
-                    KeyboardButton(key: .direction(.right)) {
-                        withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
-                            offset.width -= 100
-                        }
-                    }
-                }
-                GridRow {
-                    block
-                    KeyboardButton(key: .direction(.down)) {
-                        withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
-                            offset.height -= 100
-                        }
-                    }
-                    block
-                }
-            }
-                
+        VStack {
             Spacer()
+            HStack {
+                Grid {
+                    GridRow {
+                        KeyboardButton(key: .zoomOut) {
+                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                                scale -= 0.1
+                            }
+                        }
+                        KeyboardButton(key: .zoomIn) {
+                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                                scale += 0.1
+                            }
+                        }
+                        block
+                    }
+                    
+                    Color.clear.gridCellUnsizedAxes(.horizontal)
+                        .frame(height: 4)
+                    
+                    GridRow {
+                        block
+                        KeyboardButton(key: .direction(.up)) {
+                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                                offset.height += 100
+                            }
+                        }
+                        block
+                    }
+                    GridRow {
+                        KeyboardButton(key: .direction(.left)) {
+                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                                offset.width += 100
+                            }
+                        }
+                        KeyboardButton(key: .reset) {
+                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                                offset = .zero
+                            }
+                        }
+                        KeyboardButton(key: .direction(.right)) {
+                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                                offset.width -= 100
+                            }
+                        }
+                    }
+                    GridRow {
+                        block
+                        KeyboardButton(key: .direction(.down)) {
+                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                                offset.height -= 100
+                            }
+                        }
+                        block
+                    }
+                }
+                Spacer()
+            }
         }
         .overlay(alignment: .top) {
             VStack(spacing: 2) {
@@ -473,6 +475,7 @@ struct ContentView: View {
                     .opacity(0.5)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, 5)
         .padding(.vertical, 20)
     }
@@ -580,7 +583,7 @@ struct BlockView: View {
                 }
                         
             } else if item == .bucket {
-                Color.blue
+                Color.blue.opacity(0.75)
             }
         } left: {
             if let side = item.texture.blockSide {
@@ -599,7 +602,7 @@ struct BlockView: View {
                         .brightness(-0.1)
                 }
             } else if item == .bucket {
-                Color.blue
+                Color.blue.opacity(0.5)
             }
         } right: {
             if let side = item.texture.blockSide {
@@ -618,7 +621,7 @@ struct BlockView: View {
                         .brightness(-0.2)
                 }
             } else if item == .bucket {
-                Color.blue
+                Color.blue.opacity(0.3)
             }
         }
     }

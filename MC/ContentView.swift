@@ -57,42 +57,6 @@ struct World {
     var height = 6
     var blocks = [Block]()
     
-    struct Coordinate: Hashable, Comparable {
-        var row: Int
-        var column: Int
-        var levitation: Int
-        
-        static func < (lhs: World.Coordinate, rhs: World.Coordinate) -> Bool {
-            /// from https://sarunw.com/posts/how-to-sort-by-multiple-properties-in-swift/
-            let predicates: [(World.Coordinate, World.Coordinate) -> Bool] = [ // <2>
-                { $0.row < $1.row },
-                { $0.column < $1.column },
-                { $0.levitation < $1.levitation }
-            ]
-               
-            for predicate in predicates { // <3>
-                if !predicate(lhs, rhs), !predicate(rhs, lhs) { // <4>
-                    continue // <5>
-                }
-                   
-                return predicate(lhs, rhs) // <5>
-            }
-            
-            return false
-        }
-    }
-    
-    /// represents a chunk in the world
-    struct Block: Identifiable {
-        var id: Coordinate {
-            coordinate
-        }
-
-        var coordinate: Coordinate
-        var blockKind: BlockKind
-        var extrusionPercentage = CGFloat(1)
-    }
-    
     static let defaultWorld: Self = {
         let width = 15
         let height = 6
@@ -199,6 +163,47 @@ struct World {
     }()
 }
 
+struct Coordinate: Hashable, Comparable {
+    var row: Int
+    var column: Int
+    var levitation: Int
+    
+    static func < (lhs: Coordinate, rhs: Coordinate) -> Bool {
+        /// from https://sarunw.com/posts/how-to-sort-by-multiple-properties-in-swift/
+        let predicates: [(Coordinate, Coordinate) -> Bool] = [ // <2>
+            { $0.row < $1.row },
+            { $0.column < $1.column },
+            { $0.levitation < $1.levitation }
+        ]
+           
+        for predicate in predicates { // <3>
+            if !predicate(lhs, rhs), !predicate(rhs, lhs) { // <4>
+                continue // <5>
+            }
+               
+            return predicate(lhs, rhs) // <5>
+        }
+        
+        return false
+    }
+}
+
+/// represents a chunk in the world
+/// use `Hashable` for preventing duplicate coordinates
+struct Block: Identifiable, Hashable {
+    var id: Coordinate {
+        coordinate
+    }
+
+    var coordinate: Coordinate
+    var blockKind: BlockKind
+    var extrusionPercentage = CGFloat(1)
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(coordinate)
+    }
+}
+
 enum BlockKind: String, CaseIterable {
     case dirt
     case grass
@@ -266,7 +271,7 @@ enum Item: String, CaseIterable {
                         tilt: 1,
                         length: 20,
                         levitation: 0,
-                        block: World.Block(
+                        block: Block(
                             coordinate: .init( /// coordinate is ignored
                                 row: 0,
                                 column: 0,
@@ -361,12 +366,13 @@ struct ContentView: View {
         }
     }
     
-    func addBlock(at coordinate: World.Coordinate) {
+    func addBlock(at coordinate: Coordinate) {
         if selectedItem == .bucket {
             var blocks = world.blocks
             DispatchQueue.global().async {
                 blocks = modifyWorldForWater(existingBlocks: blocks, at: coordinate, depth: 0)
                 blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
+                blocks = blocks.uniqued()
                 
                 DispatchQueue.main.async {
                     world.blocks = blocks
@@ -379,7 +385,7 @@ struct ContentView: View {
             
             var blocks = world.blocks
             DispatchQueue.global().async {
-                let block = World.Block(coordinate: coordinate, blockKind: associatedBlockKind)
+                let block = Block(coordinate: coordinate, blockKind: associatedBlockKind)
                 blocks.append(block)
                 blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
                 
@@ -390,7 +396,7 @@ struct ContentView: View {
         }
     }
     
-    func modifyWorldForWater(existingBlocks: [World.Block], at coordinate: World.Coordinate, depth: Int) -> [World.Block] {
+    func modifyWorldForWater(existingBlocks: [Block], at coordinate: Coordinate, depth: Int) -> [Block] {
         var waterSpread = 5
         var existingBlocks = existingBlocks
         
@@ -403,15 +409,15 @@ struct ContentView: View {
                     && $0.coordinate.levitation < coordinate.levitation
             }) {
                 let waterHeight = CGFloat(coordinate.levitation - surface.coordinate.levitation) - (0.2 + CGFloat(depth) * 0.2) /// make the extrusion larger
-                let waterAboveSurfaceCoordinate = World.Coordinate(row: coordinate.row, column: coordinate.column, levitation: surface.coordinate.levitation + 1)
-                let waterAboveSurface = World.Block(coordinate: waterAboveSurfaceCoordinate, blockKind: .water, extrusionPercentage: max(0, waterHeight))
+                let waterAboveSurfaceCoordinate = Coordinate(row: coordinate.row, column: coordinate.column, levitation: surface.coordinate.levitation + 1)
+                let waterAboveSurface = Block(coordinate: waterAboveSurfaceCoordinate, blockKind: .water, extrusionPercentage: max(0, waterHeight))
                 existingBlocks.append(waterAboveSurface)
                 
                 existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterAboveSurfaceCoordinate, depth: 0)
             }
         }
         
-        let coordinateUnderneath = World.Coordinate(row: coordinate.row, column: coordinate.column, levitation: coordinate.levitation - 1)
+        let coordinateUnderneath = Coordinate(row: coordinate.row, column: coordinate.column, levitation: coordinate.levitation - 1)
         
         if
             depth == 0, /// only spread if the depth is 0 and the block underneath is land
@@ -428,7 +434,7 @@ struct ContentView: View {
                 ]
                 
                 let surroundingCoordinates = surroundingOffsets.map {
-                    World.Coordinate(row: coordinateUnderneath.row + $0.y, column: coordinateUnderneath.column + $0.x, levitation: coordinateUnderneath.levitation)
+                    Coordinate(row: coordinateUnderneath.row + $0.y, column: coordinateUnderneath.column + $0.x, levitation: coordinateUnderneath.levitation)
                 }
                 
                 let surroundingSurfaces = surroundingCoordinates.filter { surroundingCoordinate in
@@ -443,12 +449,12 @@ struct ContentView: View {
                     /// draw a diamond-shaped ring of blocks
                     for column in -index...index {
                         let rowOffset = index - abs(column)
-                        let waterCoordinate = World.Coordinate(row: coordinate.row + rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
+                        let waterCoordinate = Coordinate(row: coordinate.row + rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
                         
                         existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterCoordinate, depth: depth + index + 1)
                             
                         if column != -index {
-                            let waterCoordinate = World.Coordinate(row: coordinate.row - rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
+                            let waterCoordinate = Coordinate(row: coordinate.row - rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
                             existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterCoordinate, depth: depth + index + 1)
                         }
                     }
@@ -476,21 +482,21 @@ struct ContentView: View {
                                 levitation: CGFloat(block.coordinate.levitation) * blockLength,
                                 block: block
                             ) /** topPressed */ {
-                                let coordinate = World.Coordinate(
+                                let coordinate = Coordinate(
                                     row: block.coordinate.row,
                                     column: block.coordinate.column,
                                     levitation: block.coordinate.levitation + 1
                                 )
                                 addBlock(at: coordinate)
                             } leftPressed: {
-                                let coordinate = World.Coordinate(
+                                let coordinate = Coordinate(
                                     row: block.coordinate.row + 1,
                                     column: block.coordinate.column,
                                     levitation: block.coordinate.levitation
                                 )
                                 addBlock(at: coordinate)
                             } rightPressed: {
-                                let coordinate = World.Coordinate(
+                                let coordinate = Coordinate(
                                     row: block.coordinate.row,
                                     column: block.coordinate.column + 1,
                                     levitation: block.coordinate.levitation
@@ -697,7 +703,7 @@ struct BlockView: View {
     var tilt: CGFloat
     var length: CGFloat
     var levitation: CGFloat
-    var block: World.Block
+    var block: Block
     
     var topPressed: (() -> Void)?
     var leftPressed: (() -> Void)?
@@ -801,5 +807,13 @@ struct BlockView: View {
             }
         }
         .allowsHitTesting(!block.blockKind.isWater)
+    }
+}
+
+/// from https://stackoverflow.com/a/46354989/14351818
+public extension Array where Element: Hashable {
+    func uniqued() -> [Element] {
+        var seen = Set<Element>()
+        return filter { seen.insert($0).inserted }
     }
 }

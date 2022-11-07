@@ -324,6 +324,7 @@ struct ContentView: View {
     @State var selectedItem = Item.dirt
     @State var offset = CGSize.zero
     
+    @State var currentTask: Task<Void, any Error>?
     @State var scale = CGFloat(1)
     @State var savedTranslation = CGFloat(0)
     @State var additionalTranslation = CGFloat(0)
@@ -368,14 +369,15 @@ struct ContentView: View {
     }
     
     func addBlock(at coordinate: Coordinate) {
+        currentTask?.cancel()
+        currentTask = nil
+        
         if selectedItem == .bucket {
             var blocks = world.blocks
             DispatchQueue.global().async {
                 blocks = modifyWorldForWater(existingBlocks: blocks, at: coordinate, depth: 0, isInitial: true)
                 blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
                 blocks = blocks.uniqued()
-                
-//                let newlyAddedBlocks = blocks.filter { !$0.active }
 
                 DispatchQueue.main.async {
                     world.blocks = blocks
@@ -408,19 +410,24 @@ struct ContentView: View {
                         $0.2 < $1.2 /// sort by distance
                     }.group { $0.2 }
                 
-//                print("blocksWithDistance.map \(groupedBlocks)")
-                
-                for index in groupedBlocksCollection.indices {
-                    let groupedBlocks = groupedBlocksCollection[index]
-                    var blocks = world.blocks
-                    for block in groupedBlocks {
-                        blocks[block.1].active = true
-                    }
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.1) {
+                currentTask = Task {
+                    for index in groupedBlocksCollection.indices {
+                        try Task.checkCancellation()
+                        
+                        let groupedBlocks = groupedBlocksCollection[index]
+                        var blocks = world.blocks
+                        for block in groupedBlocks {
+                            let blockIndex = block.1
+                            if blocks.indices.contains(blockIndex) {
+                                blocks[blockIndex].active = true
+                            }
+                        }
+                        
                         withAnimation(.spring(response: 0.2, dampingFraction: 1, blendDuration: 1)) {
                             world.blocks = blocks
                         }
+                        
+                        try await Task.sleep(seconds: 0.1)
                     }
                 }
             }
@@ -852,6 +859,7 @@ struct BlockView: View {
             }
         }
         .allowsHitTesting(!block.blockKind.isWater)
+        .opacity(block.active ? 1 : 0)
     }
 }
 
@@ -880,5 +888,12 @@ extension Sequence {
             }
         }
         return groupsOrder.map { groups[$0]! }
+    }
+}
+
+extension Task where Success == Never, Failure == Never {
+    static func sleep(seconds: Double) async throws {
+        let duration = UInt64(seconds * 1_000_000_000)
+        try await Task.sleep(nanoseconds: duration)
     }
 }

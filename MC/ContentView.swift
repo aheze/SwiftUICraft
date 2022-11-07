@@ -198,6 +198,7 @@ struct Block: Identifiable, Hashable {
     var coordinate: Coordinate
     var blockKind: BlockKind
     var extrusionPercentage = CGFloat(1)
+    var active = true
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(coordinate)
@@ -374,8 +375,53 @@ struct ContentView: View {
                 blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
                 blocks = blocks.uniqued()
                 
+//                let newlyAddedBlocks = blocks.filter { !$0.active }
+
                 DispatchQueue.main.async {
                     world.blocks = blocks
+                }
+
+                /**
+                 1. the block
+                 2. the block's index in `blocks`
+                 3. the block's planar distance from the source block
+                 */
+                let blocksWithIndicesAndDistance: [(Block, Int, Int)] = blocks.indices.compactMap { index in
+                    let block = blocks[index]
+                    
+                    if block.blockKind.isWater {
+                        return (
+                            block,
+                            index,
+                            DistanceSquared(
+                                from: (x: block.coordinate.column, y: block.coordinate.row),
+                                to: (x: coordinate.column, y: coordinate.row)
+                            )
+                        )
+                    } else {
+                        return nil
+                    }
+                }
+                
+                let groupedBlocksCollection = blocksWithIndicesAndDistance
+                    .sorted {
+                        $0.2 < $1.2 /// sort by distance
+                    }.group { $0.2 }
+                
+//                print("blocksWithDistance.map \(groupedBlocks)")
+                
+                for index in groupedBlocksCollection.indices {
+                    let groupedBlocks = groupedBlocksCollection[index]
+                    var blocks = world.blocks
+                    for block in groupedBlocks {
+                        blocks[block.1].active = true
+                    }
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.1) {
+                        withAnimation(.spring(response: 0.2, dampingFraction: 1, blendDuration: 1)) {
+                            world.blocks = blocks
+                        }
+                    }
                 }
             }
             
@@ -410,7 +456,7 @@ struct ContentView: View {
             }) {
                 let waterHeight = CGFloat(coordinate.levitation - surface.coordinate.levitation) - (0.2 + CGFloat(depth) * 0.2) /// make the extrusion larger
                 let waterAboveSurfaceCoordinate = Coordinate(row: coordinate.row, column: coordinate.column, levitation: surface.coordinate.levitation + 1)
-                let waterAboveSurface = Block(coordinate: waterAboveSurfaceCoordinate, blockKind: isInitial ? .waterSource : .water, extrusionPercentage: max(0, waterHeight))
+                let waterAboveSurface = Block(coordinate: waterAboveSurfaceCoordinate, blockKind: isInitial ? .waterSource : .water, extrusionPercentage: max(0, waterHeight), active: false)
                 existingBlocks.append(waterAboveSurface)
                 existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterAboveSurfaceCoordinate, depth: 0)
             }
@@ -773,7 +819,7 @@ struct BlockView: View {
         PrismView(
             tilt: tilt,
             size: .init(width: length, height: length),
-            extrusion: length * block.extrusionPercentage,
+            extrusion: block.active ? length * block.extrusionPercentage : 0,
             levitation: levitation,
             shadowOpacity: 0.25
         ) {
@@ -814,5 +860,25 @@ public extension Array where Element: Hashable {
     func uniqued() -> [Element] {
         var seen = Set<Element>()
         return filter { seen.insert($0).inserted }
+    }
+}
+
+func DistanceSquared(from: (x: Int, y: Int), to: (x: Int, y: Int)) -> Int {
+    return (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y)
+}
+
+/// from https://stackoverflow.com/a/43520047/14351818
+extension Sequence {
+    func group<GroupingType: Hashable>(by key: (Iterator.Element) -> GroupingType) -> [[Iterator.Element]] {
+        var groups: [GroupingType: [Iterator.Element]] = [:]
+        var groupsOrder: [GroupingType] = []
+        forEach { element in
+            let key = key(element)
+            if case nil = groups[key]?.append(element) {
+                groups[key] = [element]
+                groupsOrder.append(key)
+            }
+        }
+        return groupsOrder.map { groups[$0]! }
     }
 }

@@ -6,23 +6,197 @@
 //  Copyright © 2022 A. Zheng. All rights reserved.
 //
     
-
+import Prism
 import SwiftUI
 
-struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+enum Direction {
+    case up
+    case right
+    case down
+    case left
+    
+    var rotation: CGFloat {
+        switch self {
+        case .up:
+            return 0
+        case .right:
+            return 90
+        case .down:
+            return 180
+        case .left:
+            return 270
         }
-        .padding()
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+enum Item: String, CaseIterable {
+    case dirt
+    case grass
+    case log
+    case stone
+    case leaf
+    
+    case pick
+    case sword
+    case bucket
+    case beef
+    
+    var texture: Texture {
+        switch self {
+        case .dirt:
+            return .init(itemPreview: nil, blockTop: "dirt", blockSide: "dirt")
+        case .grass:
+            return .init(itemPreview: nil, blockTop: "grass_block_top", blockSide: "grass_block_side")
+        case .log:
+            return .init(itemPreview: nil, blockTop: "oak_log_top", blockSide: "oak_log")
+        case .stone:
+            return .init(itemPreview: nil, blockTop: "stone", blockSide: "stone")
+        case .leaf:
+            return .init(itemPreview: nil, blockTop: "oak_leaves", blockSide: "oak_leaves")
+        case .pick:
+            return .init(itemPreview: "diamond_pickaxe", blockTop: nil, blockSide: nil)
+        case .sword:
+            return .init(itemPreview: "diamond_sword", blockTop: nil, blockSide: nil)
+        case .bucket:
+            return .init(itemPreview: "water_bucket", blockTop: nil, blockSide: nil)
+        case .beef:
+            return .init(itemPreview: "cooked_beef", blockTop: nil, blockSide: nil)
+        }
+    }
+    
+    var block: Block? {
+        switch self {
+        case .dirt, .grass, .log, .stone, .leaf:
+            return Block(tilt: 1, length: 20, item: self)
+        default:
+            return nil
+        }
+    }
+}
+
+struct Texture {
+    var itemPreview: String?
+    var blockTop: String?
+    var blockSide: String?
+}
+
+struct ContentView: View {
+    var body: some View {
+        Color.clear.overlay {
+            VStack {
+                Spacer()
+                
+                HStack {
+                    Grid {
+                        GridRow {
+                            slot
+                            Switch(direction: .up)
+                            slot
+                        }
+                        GridRow {
+                            Switch(direction: .left)
+                            slot
+                            Switch(direction: .right)
+                        }
+                        GridRow {
+                            slot
+                            Switch(direction: .down)
+                            slot
+                        }
+                    }
+                    
+                    Spacer()
+                }
+                .overlay(alignment: .bottomTrailing) {
+                    HStack {
+                        ForEach(Item.allCases, id: \.rawValue) { item in
+                            ItemView(item: item)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 5)
+            .padding(.vertical, 20)
+        }
+        .background {
+            Color.blue.ignoresSafeArea()
+        }
+    }
+    
+    var slot: some View {
+        Color.clear.gridCellUnsizedAxes([.vertical, .horizontal])
+    }
+}
+
+struct Switch: View {
+    var direction: Direction
+    
+    var body: some View {
+        Button {} label: {
+            Image("button")
+                .interpolation(.none)
+                .resizable()
+                .frame(width: 70, height: 70)
+                .rotationEffect(.degrees(direction.rotation))
+        }
+    }
+}
+
+struct ItemView: View {
+    var item: Item
+    
+    var body: some View {
+        Color.black.opacity(0.1)
+            .overlay {
+                if let itemPreview = item.texture.itemPreview {
+                    Image(itemPreview)
+                        .interpolation(.none)
+                        .resizable()
+                        .padding(5)
+                } else if let block = item.block {
+                    PrismCanvas(tilt: 1) {
+                        block
+                    }
+                    .scaleEffect(y: 0.69)
+                    .offset(y: 10)
+                }
+            }
+            .frame(width: 60, height: 60)
+    }
+}
+
+struct Block: View {
+    var tilt: CGFloat
+    var length: CGFloat
+    var item: Item
+    
+    var body: some View {
+        PrismView(tilt: tilt, size: .init(width: length, height: length), extrusion: length) {
+            if let top = item.texture.blockTop ?? item.texture.blockSide {
+                Image(top)
+                    .interpolation(.none)
+                    .resizable()
+            } else {
+                Color.clear
+            }
+        } left: {
+            if let side = item.texture.blockSide {
+                Image(side)
+                    .interpolation(.none)
+                    .resizable()
+                    .brightness(-0.1)
+            } else {
+                Color.clear
+            }
+        } right: {
+            if let side = item.texture.blockSide {
+                Image(side)
+                    .interpolation(.none)
+                    .resizable()
+                    .brightness(-0.2)
+            } else {
+                Color.clear
+            }
+        }
     }
 }

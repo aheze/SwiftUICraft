@@ -11,6 +11,7 @@
 		3CBC12832918B0A300D9DB0E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CBC12822918B0A300D9DB0E /* ContentView.swift */; };
 		3CBC12852918B0A400D9DB0E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3CBC12842918B0A400D9DB0E /* Assets.xcassets */; };
 		3CBC12882918B0A400D9DB0E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3CBC12872918B0A400D9DB0E /* Preview Assets.xcassets */; };
+		3CBC12902918B0D900D9DB0E /* Prism in Frameworks */ = {isa = PBXBuildFile; productRef = 3CBC128F2918B0D900D9DB0E /* Prism */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3CBC12902918B0D900D9DB0E /* Prism in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +85,9 @@
 			dependencies = (
 			);
 			name = MC;
+			packageProductDependencies = (
+				3CBC128F2918B0D900D9DB0E /* Prism */,
+			);
 			productName = MC;
 			productReference = 3CBC127D2918B0A300D9DB0E /* MC.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +116,9 @@
 				Base,
 			);
 			mainGroup = 3CBC12742918B0A300D9DB0E;
+			packageReferences = (
+				3CBC128E2918B0D900D9DB0E /* XCRemoteSwiftPackageReference "Prism" */,
+			);
 			productRefGroup = 3CBC127E2918B0A300D9DB0E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -339,6 +347,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3CBC128E2918B0D900D9DB0E /* XCRemoteSwiftPackageReference "Prism" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/aheze/Prism";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3CBC128F2918B0D900D9DB0E /* Prism */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3CBC128E2918B0D900D9DB0E /* XCRemoteSwiftPackageReference "Prism" */;
+			productName = Prism;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3CBC12752918B0A300D9DB0E /* Project object */;
 }

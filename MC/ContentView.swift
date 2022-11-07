@@ -227,6 +227,16 @@ struct ContentView: View {
         }
     }
     
+    func addBlock(at coordinate: World.Coordinate) {
+        /// only allow blocks to be placed, not other items
+        guard selectedItem.previewBlock != nil else { return }
+        
+        let slot = World.Slot(coordinate: coordinate, item: selectedItem)
+        world.slots.append(slot)
+        
+        print("addin: \(slot)")
+    }
+    
     var game: some View {
         PrismCanvas(tilt: tilt) {
             let size = CGSize(
@@ -243,7 +253,28 @@ struct ContentView: View {
                                 length: blockLength,
                                 levitation: CGFloat(slot.coordinate.levitation) * blockLength,
                                 item: slot.item
-                            )
+                            ) /** topPressed */ {
+                                let coordinate = World.Coordinate(
+                                    row: slot.coordinate.row,
+                                    column: slot.coordinate.column,
+                                    levitation: slot.coordinate.levitation + 1
+                                )
+                                addBlock(at: coordinate)
+                            } leftPressed: {
+                                let coordinate = World.Coordinate(
+                                    row: slot.coordinate.row + 1,
+                                    column: slot.coordinate.column,
+                                    levitation: slot.coordinate.levitation
+                                )
+                                addBlock(at: coordinate)
+                            } rightPressed: {
+                                let coordinate = World.Coordinate(
+                                    row: slot.coordinate.row,
+                                    column: slot.coordinate.column + 1,
+                                    levitation: slot.coordinate.levitation
+                                )
+                                addBlock(at: coordinate)
+                            }
                             .offset(
                                 x: CGFloat(slot.coordinate.column) * blockLength,
                                 y: CGFloat(slot.coordinate.row) * blockLength
@@ -383,6 +414,10 @@ struct Block: View {
     var levitation: CGFloat
     var item: Item
     
+    var topPressed: (() -> Void)?
+    var leftPressed: (() -> Void)?
+    var rightPressed: (() -> Void)?
+    
     var body: some View {
         PrismView(
             tilt: tilt,
@@ -392,27 +427,33 @@ struct Block: View {
             shadowOpacity: 0
         ) {
             if let top = item.texture.blockTop ?? item.texture.blockSide {
-                Image(top)
-                    .interpolation(.none)
-                    .resizable()
+                Button {} label: {
+                    Image(top)
+                        .interpolation(.none)
+                        .resizable()
+                }
             } else {
                 Color.clear
             }
         } left: {
             if let side = item.texture.blockSide {
-                Image(side)
-                    .interpolation(.none)
-                    .resizable()
-                    .brightness(-0.1)
+                Button {} label: {
+                    Image(side)
+                        .interpolation(.none)
+                        .resizable()
+                        .brightness(-0.1)
+                }
             } else {
                 Color.clear
             }
         } right: {
             if let side = item.texture.blockSide {
-                Image(side)
-                    .interpolation(.none)
-                    .resizable()
-                    .brightness(-0.2)
+                Button {} label: {
+                    Image(side)
+                        .interpolation(.none)
+                        .resizable()
+                        .brightness(-0.2)
+                }
             } else {
                 Color.clear
             }

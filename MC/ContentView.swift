@@ -11,6 +11,7 @@ import SwiftUI
 
 enum KeyboardKey {
     case direction(Direction)
+    case center
     case reset
     case zoomIn
     case zoomOut
@@ -39,6 +40,8 @@ enum KeyboardKey {
         switch self {
         case .direction:
             return "button_arrow"
+        case .center:
+            return "button_center"
         case .reset:
             return "button_reset"
         case .zoomIn:
@@ -309,19 +312,12 @@ struct ContentView: View {
     
     func addBlock(at coordinate: World.Coordinate) {
         if selectedItem == .bucket {
-            print("Water!")
             var blocks = world.blocks
             DispatchQueue.global().async {
                 blocks = modifyWorldForWater(existingBlocks: blocks, at: coordinate, depth: 0)
-                
-//                let block = World.Block(coordinate: coordinate, item: selectedItem, extrusionPercentage: 0.6)
-//                blocks.append(block)
                 blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
                 
-                /// check side blocks
-                
                 DispatchQueue.main.async {
-                    print("Done!")
                     world.blocks = blocks
                 }
             }
@@ -449,6 +445,16 @@ struct ContentView: View {
             HStack {
                 Grid {
                     GridRow {
+                        KeyboardButton(key: .reset) {
+                            var blocks = world.blocks
+                            DispatchQueue.global().async {
+                                blocks = blocks.filter { $0.item != .bucket }
+                                
+                                DispatchQueue.main.async {
+                                    world.blocks = blocks
+                                }
+                            }
+                        }
                         KeyboardButton(key: .zoomOut) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                                 scale -= 0.1
@@ -459,7 +465,6 @@ struct ContentView: View {
                                 scale += 0.1
                             }
                         }
-                        block
                     }
                     
                     Color.clear.gridCellUnsizedAxes(.horizontal)
@@ -480,7 +485,7 @@ struct ContentView: View {
                                 offset.width += 100
                             }
                         }
-                        KeyboardButton(key: .reset) {
+                        KeyboardButton(key: .center) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                                 offset = .zero
                             }
@@ -650,7 +655,7 @@ struct BlockView: View {
                 }
                         
             } else if block.item == .bucket {
-                Color.blue.opacity(0.75)
+                Color.blue.opacity(0.55)
             }
         } left: {
             if let side = block.item.texture.blockSide {
@@ -669,7 +674,7 @@ struct BlockView: View {
                         .brightness(-0.1)
                 }
             } else if block.item == .bucket {
-                Color.blue.opacity(0.5)
+                Color.blue.opacity(0.35)
             }
         } right: {
             if let side = block.item.texture.blockSide {
@@ -688,8 +693,9 @@ struct BlockView: View {
                         .brightness(-0.2)
                 }
             } else if block.item == .bucket {
-                Color.blue.opacity(0.3)
+                Color.blue.opacity(0.2)
             }
         }
+        .allowsHitTesting(block.item != .bucket)
     }
 }

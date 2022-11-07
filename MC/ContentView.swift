@@ -81,6 +81,8 @@ struct Texture {
 }
 
 struct ContentView: View {
+    @State var selectedItem: Item?
+    
     var body: some View {
         Color.clear.overlay {
             VStack {
@@ -108,10 +110,32 @@ struct ContentView: View {
                     Spacer()
                 }
                 .overlay(alignment: .bottomTrailing) {
-                    HStack {
+                    HStack(spacing: 0) {
                         ForEach(Item.allCases, id: \.rawValue) { item in
-                            ItemView(item: item)
+                            let selected = selectedItem == item
+                            
+                            Button {
+                                selectedItem = item
+                            } label: {
+                                ItemView(item: item)
+                            }
+                            .buttonStyle(.minecraft)
+                            .overlay {
+                                if selected {
+                                    Image("selected")
+                                        .interpolation(.none)
+                                        .resizable()
+                                        .padding(-4)
+                                }
+                            }
+                            .zIndex(selected ? 1 : 0)
                         }
+                    }
+                    .overlay {
+                        Rectangle()
+                            .strokeBorder(Color.black, lineWidth: 3)
+                            .padding(-3)
+                            .opacity(0.5)
                     }
                 }
             }
@@ -139,6 +163,7 @@ struct Switch: View {
                 .frame(width: 70, height: 70)
                 .rotationEffect(.degrees(direction.rotation))
         }
+        .buttonStyle(.minecraft)
     }
 }
 
@@ -161,7 +186,23 @@ struct ItemView: View {
                     .offset(y: 10)
                 }
             }
-            .frame(width: 60, height: 60)
+            .overlay {
+                Rectangle()
+                    .strokeBorder(Color.black, lineWidth: 6)
+                    .opacity(0.1)
+            }
+            .overlay {
+                Rectangle()
+                    .strokeBorder(Color.white, lineWidth: 2)
+                    .opacity(0.3)
+                    .padding(2)
+            }
+            .overlay {
+                Rectangle()
+                    .strokeBorder(Color.black, lineWidth: 0.5)
+                    .opacity(0.5)
+            }
+            .frame(width: 65, height: 65)
     }
 }
 
@@ -198,5 +239,21 @@ struct Block: View {
                 Color.clear
             }
         }
+    }
+}
+
+struct MinecraftButtonStyle: ButtonStyle {
+    var scale = CGFloat(0.95)
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .brightness(configuration.isPressed ? -0.5 : 0)
+            .opacity(configuration.isPressed ? 0.8 : 1)
+    }
+}
+
+extension ButtonStyle where Self == MinecraftButtonStyle {
+    static var minecraft: MinecraftButtonStyle {
+        MinecraftButtonStyle()
     }
 }

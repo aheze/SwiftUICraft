@@ -250,6 +250,7 @@ struct ContentView: View {
     @State var selectedItem = Item.dirt
     @State var offset = CGSize.zero
     
+    @State var scale = CGFloat(1)
     @State var savedTranslation = CGFloat(0)
     @State var additionalTranslation = CGFloat(0)
     var tilt: CGFloat {
@@ -268,6 +269,7 @@ struct ContentView: View {
             Color.clear
                 .overlay {
                     game
+                        .scaleEffect(scale)
                         .offset(y: 120)
                 }
                 .offset(offset)
@@ -358,7 +360,65 @@ struct ContentView: View {
     }
     
     var controls: some View {
-        VStack {
+        HStack {
+            Grid {
+                GridRow {
+                    KeyboardButton(key: .zoomOut) {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                            scale -= 0.1
+                        }
+                    }
+                    KeyboardButton(key: .zoomIn) {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                            scale += 0.1
+                        }
+                    }
+                    slot
+                }
+                    
+                Color.clear.gridCellUnsizedAxes(.horizontal)
+                    .frame(height: 4)
+                    
+                GridRow {
+                    slot
+                    KeyboardButton(key: .direction(.up)) {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                            offset.height += 100
+                        }
+                    }
+                    slot
+                }
+                GridRow {
+                    KeyboardButton(key: .direction(.left)) {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                            offset.width += 100
+                        }
+                    }
+                    KeyboardButton(key: .reset) {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                            offset = .zero
+                        }
+                    }
+                    KeyboardButton(key: .direction(.right)) {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                            offset.width -= 100
+                        }
+                    }
+                }
+                GridRow {
+                    slot
+                    KeyboardButton(key: .direction(.down)) {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                            offset.height -= 100
+                        }
+                    }
+                    slot
+                }
+            }
+                
+            Spacer()
+        }
+        .overlay(alignment: .top) {
             VStack(spacing: 2) {
                 Text("SWIFTUICRAFT")
                     .font(.system(size: 40, weight: .heavy, design: .serif))
@@ -367,77 +427,33 @@ struct ContentView: View {
                     .font(.system(size: 16, weight: .heavy, design: .serif))
                     .opacity(0.25)
             }
-            
-            Spacer()
-            
-            HStack {
-                Grid {
-                    GridRow {
-                        slot
-                        KeyboardButton(key: .direction(.up)) {
-                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
-                                offset.height += 100
-                            }
-                        }
-                        slot
-                    }
-                    GridRow {
-                        KeyboardButton(key: .direction(.left)) {
-                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
-                                offset.width += 100
-                            }
-                        }
-                        KeyboardButton(key: .reset) {
-                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
-                                offset = .zero
-                            }
-                        }
-                        KeyboardButton(key: .direction(.right)) {
-                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
-                                offset.width -= 100
-                            }
-                        }
-                    }
-                    GridRow {
-                        slot
-                        KeyboardButton(key: .direction(.down)) {
-                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
-                                offset.height -= 100
-                            }
-                        }
-                        slot
-                    }
-                }
-                
-                Spacer()
-            }
-            .overlay(alignment: .bottomTrailing) {
-                HStack(spacing: 0) {
-                    ForEach(Item.allCases, id: \.rawValue) { item in
-                        let selected = selectedItem == item
+        }
+        .overlay(alignment: .bottomTrailing) {
+            HStack(spacing: 0) {
+                ForEach(Item.allCases, id: \.rawValue) { item in
+                    let selected = selectedItem == item
                         
-                        Button {
-                            selectedItem = item
-                        } label: {
-                            ItemView(item: item)
-                        }
-                        .overlay {
-                            if selected {
-                                Image("selected")
-                                    .interpolation(.none)
-                                    .resizable()
-                                    .padding(-4)
-                            }
-                        }
-                        .zIndex(selected ? 1 : 0)
+                    Button {
+                        selectedItem = item
+                    } label: {
+                        ItemView(item: item)
                     }
+                    .overlay {
+                        if selected {
+                            Image("selected")
+                                .interpolation(.none)
+                                .resizable()
+                                .padding(-4)
+                        }
+                    }
+                    .zIndex(selected ? 1 : 0)
                 }
-                .overlay {
-                    Rectangle()
-                        .strokeBorder(Color.black, lineWidth: 3)
-                        .padding(-3)
-                        .opacity(0.5)
-                }
+            }
+            .overlay {
+                Rectangle()
+                    .strokeBorder(Color.black, lineWidth: 3)
+                    .padding(-3)
+                    .opacity(0.5)
             }
         }
         .padding(.horizontal, 5)

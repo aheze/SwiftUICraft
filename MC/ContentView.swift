@@ -54,10 +54,96 @@ struct World {
         let height = 6
         var slots = [Slot]()
         
+        /// base dirt layer
         for row in 0..<height {
             for column in 0..<width {
+                let shouldBeDirt = (column - (height - row)) < 3
+                
                 let coordinate = Coordinate(row: row, column: column, levitation: 0)
-                let slot = Slot(coordinate: coordinate, item: .dirt)
+                let slot = Slot(coordinate: coordinate, item: shouldBeDirt ? .dirt : .grass)
+                slots.append(slot)
+            }
+        }
+        
+        /// jagged shape
+        for row in 0..<height {
+            for column in 0..<10 {
+                let shouldAdd = (column - (height - row)) < 3
+                
+                if shouldAdd {
+                    let coordinate = Coordinate(row: row, column: column, levitation: 1)
+                    let slot = Slot(coordinate: coordinate, item: .dirt)
+                    slots.append(slot)
+                }
+            }
+        }
+     
+        /// jagged shape
+        for row in 0..<height {
+            for column in 0..<10 {
+                let shouldAdd = (column - (height - row)) < 0
+                
+                if shouldAdd {
+                    let coordinate = Coordinate(row: row, column: column, levitation: 2)
+                    let slot = Slot(coordinate: coordinate, item: .grass)
+                    slots.append(slot)
+                }
+            }
+        }
+        
+        /// fill in some more grass blocks at the bottom
+        for (x, y) in [(2, 4), (1, 5), (2, 5), (3, 5)] {
+            let coordinate = Coordinate(row: y, column: x, levitation: 2)
+            let slot = Slot(coordinate: coordinate, item: .grass)
+            slots.append(slot)
+        }
+        
+        /// tree
+        let trunk = (12, 2)
+        for levitation in 1..<8 {
+            switch levitation {
+            case 5:
+                /// first layer leaves
+                for (x, y) in [(-1, -1), (0, -1), (1, -1)] {
+                    let coordinate = Coordinate(row: trunk.1 + y, column: trunk.0 + x, levitation: levitation)
+                    let slot = Slot(coordinate: coordinate, item: .leaf)
+                    slots.append(slot)
+                }
+                
+                let coordinateLeft = Coordinate(row: trunk.1, column: trunk.0 - 1, levitation: levitation)
+                let slotLeft = Slot(coordinate: coordinateLeft, item: .leaf)
+                slots.append(slotLeft)
+                
+                let coordinate = Coordinate(row: trunk.1, column: trunk.0, levitation: levitation)
+                let slot = Slot(coordinate: coordinate, item: .log)
+                slots.append(slot)
+                
+                let coordinateRight = Coordinate(row: trunk.1, column: trunk.0 + 1, levitation: levitation)
+                let slotRight = Slot(coordinate: coordinateRight, item: .leaf)
+                slots.append(slotRight)
+                
+                /// bottom leaves
+                for (x, y) in [(-1, 1), (0, 1), (1, 1)] {
+                    let coordinate = Coordinate(row: trunk.1 + y, column: trunk.0 + x, levitation: levitation)
+                    let slot = Slot(coordinate: coordinate, item: .leaf)
+                    slots.append(slot)
+                }
+            case 6:
+                /// second layer of leaves, in cross shape
+                for (x, y) in [(0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)] {
+                    let coordinateRight = Coordinate(row: trunk.1 + y, column: trunk.0 + x, levitation: levitation)
+                    let slot = Slot(coordinate: coordinateRight, item: .leaf)
+                    slots.append(slot)
+                }
+            case 7:
+                /// top leaf block
+                let coordinate = Coordinate(row: trunk.1, column: trunk.0, levitation: levitation)
+                let slot = Slot(coordinate: coordinate, item: .leaf)
+                slots.append(slot)
+            default:
+                /// just a log
+                let coordinate = Coordinate(row: trunk.1, column: trunk.0, levitation: levitation)
+                let slot = Slot(coordinate: coordinate, item: .log)
                 slots.append(slot)
             }
         }
@@ -137,7 +223,6 @@ struct ContentView: View {
                 .overlay {
                     game
                         .offset(y: 120)
-//                        .scaleEffect(0.8)
                 }
         }
     }
@@ -298,7 +383,13 @@ struct Block: View {
     var item: Item
     
     var body: some View {
-        PrismView(tilt: tilt, size: .init(width: length, height: length), extrusion: length, levitation: levitation) {
+        PrismView(
+            tilt: tilt,
+            size: .init(width: length, height: length),
+            extrusion: length,
+            levitation: levitation,
+            shadowOpacity: 0
+        ) {
             if let top = item.texture.blockTop ?? item.texture.blockSide {
                 Image(top)
                     .interpolation(.none)

@@ -234,7 +234,19 @@ enum Item: String, CaseIterable {
     var previewBlockView: BlockView? {
         switch self {
         case .dirt, .grass, .log, .stone, .leaf:
-            return BlockView(tilt: 1, length: 20, levitation: 0, item: self)
+            return BlockView(
+                tilt: 1,
+                length: 20,
+                levitation: 0,
+                block: World.Block(
+                    coordinate: .init( /// coordinate is ignored
+                        row: 0,
+                        column: 0,
+                        levitation: 0
+                    ),
+                    item: self
+                )
+            )
         default:
             return nil
         }
@@ -300,9 +312,11 @@ struct ContentView: View {
             print("Water!")
             var blocks = world.blocks
             DispatchQueue.global().async {
-                let block = World.Block(coordinate: coordinate, item: selectedItem)
+                let block = World.Block(coordinate: coordinate, item: selectedItem, extrusionPercentage: 0.6)
                 blocks.append(block)
                 blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
+                
+                /// check side blocks
                 
                 DispatchQueue.main.async {
                     world.blocks = blocks
@@ -326,6 +340,58 @@ struct ContentView: View {
         }
     }
     
+    func modifyWorldForWater(existingBlocks: [World.Block], at coordinate: World.Coordinate, depth: Int) -> [World.Block] {
+        var existingBlocks = existingBlocks
+        
+        /// base case - a block is blocking more water flow
+        if existingBlocks.contains(where: { $0.coordinate == coordinate }) {
+            return existingBlocks
+        }
+        
+        
+        /// check if current block is on a surface
+        if existingBlocks.contains(where: {
+            $0.coordinate.row == coordinate.row
+                && $0.coordinate.column == coordinate.column
+                && $0.coordinate.levitation == coordinate.levitation - 1
+        }) {
+            for row in (-1..<1) {
+                for column in (-1..<1) {
+                    let coordinate = World.Coordinate(row: coordinate.row + row, column: coordinate.column + column, levitation: coordinate.levitation)
+                    existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: coordinate, depth: depth + 1)
+                    
+                }
+            }
+        }
+        
+        /// check surrounding offsets
+        /// add water if necessary
+        for (x, y) in [(0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)] {
+            let coordinate = World.Coordinate(row: coordinate.row + y, column: coordinate.row + x, levitation: coordinate.levitation)
+            
+            /// check if there's empty space
+            if !existingBlocks.contains(where: { $0.coordinate == coordinate }) {
+                if let surface = existingBlocks.last(where: {
+                    $0.coordinate.row == coordinate.row
+                        && $0.coordinate.column == coordinate.column
+                        && $0.coordinate.levitation < coordinate.levitation
+                }) {
+                    print("got surface!")
+                    
+                    let waterHeight = CGFloat(coordinate.levitation - surface.coordinate.levitation) - 0.5 /// make the extrusion larger
+                    let waterAboveSurfaceCoordinate = World.Coordinate(row: coordinate.row, column: coordinate.row, levitation: surface.levitation + 1)
+                    let waterAboveSurface = World.Block(coordinate: waterAboveSurfaceCoordinate, item: .bucket, extrusionPercentage: waterHeight)
+                    existingBlocks.append(waterAboveSurface)
+                    
+                    
+                    existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterAboveSurfaceCoordinate, depth: 0)
+                }
+            }
+        }
+        
+        return existingBlocks
+    }
+    
     var game: some View {
         PrismCanvas(tilt: tilt) {
             let size = CGSize(
@@ -341,7 +407,7 @@ struct ContentView: View {
                                 tilt: tilt,
                                 length: blockLength,
                                 levitation: CGFloat(block.coordinate.levitation) * blockLength,
-                                item: block.item
+                                block: block
                             ) /** topPressed */ {
                                 let coordinate = World.Coordinate(
                                     row: block.coordinate.row,
@@ -554,7 +620,7 @@ struct BlockView: View {
     var tilt: CGFloat
     var length: CGFloat
     var levitation: CGFloat
-    var item: Item
+    var block: World.Block
     
     var topPressed: (() -> Void)?
     var leftPressed: (() -> Void)?
@@ -564,11 +630,11 @@ struct BlockView: View {
         PrismView(
             tilt: tilt,
             size: .init(width: length, height: length),
-            extrusion: length,
+            extrusion: length * block.extrusionPercentage,
             levitation: levitation,
             shadowOpacity: 0.25
         ) {
-            if let top = item.texture.blockTop ?? item.texture.blockSide {
+            if let top = block.item.texture.blockTop ?? block.item.texture.blockSide {
                 if let topPressed {
                     Image(top)
                         .interpolation(.none)
@@ -582,11 +648,11 @@ struct BlockView: View {
                         .resizable()
                 }
                         
-            } else if item == .bucket {
+            } else if block.item == .bucket {
                 Color.blue.opacity(0.75)
             }
         } left: {
-            if let side = item.texture.blockSide {
+            if let side = block.item.texture.blockSide {
                 if let leftPressed {
                     Image(side)
                         .interpolation(.none)
@@ -601,11 +667,11 @@ struct BlockView: View {
                         .resizable()
                         .brightness(-0.1)
                 }
-            } else if item == .bucket {
+            } else if block.item == .bucket {
                 Color.blue.opacity(0.5)
             }
         } right: {
-            if let side = item.texture.blockSide {
+            if let side = block.item.texture.blockSide {
                 if let rightPressed {
                     Image(side)
                         .interpolation(.none)
@@ -620,7 +686,7 @@ struct BlockView: View {
                         .resizable()
                         .brightness(-0.2)
                 }
-            } else if item == .bucket {
+            } else if block.item == .bucket {
                 Color.blue.opacity(0.3)
             }
         }

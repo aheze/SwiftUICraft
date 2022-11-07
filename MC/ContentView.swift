@@ -32,7 +32,7 @@ enum Direction {
 struct World {
     var width = 15
     var height = 6
-    var coordinateToItem = [Coordinate: Item]()
+    var slots = [Slot]()
     
     struct Coordinate: Hashable {
         var row: Int
@@ -40,19 +40,29 @@ struct World {
         var levitation: Int
     }
     
+    struct Slot: Identifiable {
+        var id: Coordinate {
+            coordinate
+        }
+
+        var coordinate: Coordinate
+        var item: Item
+    }
+    
     static let defaultWorld: Self = {
         let width = 15
         let height = 6
-        var coordinateToItem = [Coordinate: Item]()
+        var slots = [Slot]()
         
         for row in 0..<height {
             for column in 0..<width {
                 let coordinate = Coordinate(row: row, column: column, levitation: 0)
-                coordinateToItem[coordinate] = Item.dirt
+                let slot = Slot(coordinate: coordinate, item: .dirt)
+                slots.append(slot)
             }
         }
         
-        let world = World(coordinateToItem: coordinateToItem)
+        let world = World(slots: slots)
         
         return world
     }()
@@ -93,10 +103,10 @@ enum Item: String, CaseIterable {
         }
     }
     
-    var block: Block? {
+    var previewBlock: Block? {
         switch self {
         case .dirt, .grass, .log, .stone, .leaf:
-            return Block(tilt: 1, length: 20, item: self)
+            return Block(tilt: 1, length: 20, levitation: 0, item: self)
         default:
             return nil
         }
@@ -139,6 +149,23 @@ struct ContentView: View {
                     width: CGFloat(world.width) * blockLength,
                     height: CGFloat(world.height) * blockLength
                 )
+                .overlay {
+                    ZStack(alignment: .topLeading) {
+                        ForEach(world.slots) { slot in
+                            Block(
+                                tilt: tilt,
+                                length: blockLength,
+                                levitation: CGFloat(slot.coordinate.levitation) * blockLength,
+                                item: slot.item
+                            )
+                            .offset(
+                                x: CGFloat(slot.coordinate.column) * blockLength,
+                                y: CGFloat(slot.coordinate.row) * blockLength
+                            )
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                }
         }
         .scaleEffect(y: 0.69)
     }
@@ -178,7 +205,6 @@ struct ContentView: View {
                         } label: {
                             ItemView(item: item)
                         }
-                        .buttonStyle(.minecraft)
                         .overlay {
                             if selected {
                                 Image("selected")
@@ -212,13 +238,17 @@ struct Switch: View {
     
     var body: some View {
         Button {} label: {
-            Image("button")
+            Image("button_background")
                 .interpolation(.none)
                 .resizable()
                 .frame(width: 70, height: 70)
-                .rotationEffect(.degrees(direction.rotation))
+                .overlay {
+                    Image("button_arrow")
+                        .interpolation(.none)
+                        .resizable()
+                        .rotationEffect(.degrees(direction.rotation))
+                }
         }
-        .buttonStyle(.minecraft)
     }
 }
 
@@ -233,7 +263,7 @@ struct ItemView: View {
                         .interpolation(.none)
                         .resizable()
                         .padding(7)
-                } else if let block = item.block {
+                } else if let block = item.previewBlock {
                     PrismCanvas(tilt: 1) {
                         block
                     }
@@ -264,10 +294,11 @@ struct ItemView: View {
 struct Block: View {
     var tilt: CGFloat
     var length: CGFloat
+    var levitation: CGFloat
     var item: Item
     
     var body: some View {
-        PrismView(tilt: tilt, size: .init(width: length, height: length), extrusion: length) {
+        PrismView(tilt: tilt, size: .init(width: length, height: length), extrusion: length, levitation: levitation) {
             if let top = item.texture.blockTop ?? item.texture.blockSide {
                 Image(top)
                     .interpolation(.none)
@@ -294,21 +325,5 @@ struct Block: View {
                 Color.clear
             }
         }
-    }
-}
-
-struct MinecraftButtonStyle: ButtonStyle {
-    var scale = CGFloat(0.95)
-    
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .brightness(configuration.isPressed ? -0.5 : 0)
-            .opacity(configuration.isPressed ? 0.8 : 1)
-    }
-}
-
-extension ButtonStyle where Self == MinecraftButtonStyle {
-    static var minecraft: MinecraftButtonStyle {
-        MinecraftButtonStyle()
     }
 }

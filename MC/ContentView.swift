@@ -9,25 +9,42 @@
 import Prism
 import SwiftUI
 
-enum Direction {
-    case up
-    case right
-    case down
-    case left
+enum KeyboardKey {
+    case direction(Direction)
     case reset
+    case zoomIn
+    case zoomOut
     
-    var rotation: CGFloat {
+    enum Direction {
+        case up
+        case right
+        case down
+        case left
+        
+        var rotation: CGFloat {
+            switch self {
+            case .up:
+                return 0
+            case .right:
+                return 90
+            case .down:
+                return 180
+            case .left:
+                return 270
+            }
+        }
+    }
+
+    var image: String {
         switch self {
-        case .up:
-            return 0
-        case .right:
-            return 90
-        case .down:
-            return 180
-        case .left:
-            return 270
+        case .direction:
+            return "button_arrow"
         case .reset:
-            return 0
+            return "button_reset"
+        case .zoomIn:
+            return "button_in"
+        case .zoomOut:
+            return "button_out"
         }
     }
 }
@@ -253,10 +270,8 @@ struct ContentView: View {
                     game
                         .offset(y: 120)
                 }
-                .padding(.horizontal, -200)
-                .padding(.vertical, -100)
-                .drawingGroup()
                 .offset(offset)
+                .drawingGroup()
                 .background {
                     LinearGradient(colors: [.blue, .white, .white, .brown], startPoint: .top, endPoint: .bottom)
                         .opacity(0.2)
@@ -359,7 +374,7 @@ struct ContentView: View {
                 Grid {
                     GridRow {
                         slot
-                        Switch(direction: .up) {
+                        KeyboardButton(key: .direction(.up)) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                                 offset.height += 100
                             }
@@ -367,17 +382,17 @@ struct ContentView: View {
                         slot
                     }
                     GridRow {
-                        Switch(direction: .left) {
+                        KeyboardButton(key: .direction(.left)) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                                 offset.width += 100
                             }
                         }
-                        Switch(direction: .reset) {
+                        KeyboardButton(key: .reset) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                                 offset = .zero
                             }
                         }
-                        Switch(direction: .right) {
+                        KeyboardButton(key: .direction(.right)) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                                 offset.width -= 100
                             }
@@ -385,7 +400,7 @@ struct ContentView: View {
                     }
                     GridRow {
                         slot
-                        Switch(direction: .down) {
+                        KeyboardButton(key: .direction(.down)) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                                 offset.height -= 100
                             }
@@ -434,8 +449,8 @@ struct ContentView: View {
     }
 }
 
-struct Switch: View {
-    var direction: Direction
+struct KeyboardButton: View {
+    var key: KeyboardKey
     var action: () -> Void
     
     var body: some View {
@@ -445,15 +460,15 @@ struct Switch: View {
                 .resizable()
                 .frame(width: 70, height: 70)
                 .overlay {
-                    if direction == .reset {
-                        Image("button_reset")
-                            .interpolation(.none)
-                            .resizable()
-                    } else {
-                        Image("button_arrow")
+                    if case let .direction(direction) = key {
+                        Image(key.image)
                             .interpolation(.none)
                             .resizable()
                             .rotationEffect(.degrees(direction.rotation))
+                    } else {
+                        Image(key.image)
+                            .interpolation(.none)
+                            .resizable()
                     }
                 }
         }

@@ -111,7 +111,9 @@ struct Texture {
 
 struct ContentView: View {
     @State var world = World.defaultWorld
-    @State var selectedItem: Item?
+    @State var selectedItem = Item.dirt
+    @State var tilt = CGFloat(0.3)
+    let blockLength = CGFloat(50)
     
     var body: some View {
         Color.clear.overlay {
@@ -122,7 +124,23 @@ struct ContentView: View {
                 .opacity(0.2)
                 .background(Color.white)
                 .ignoresSafeArea()
+                .overlay {
+                    game
+                        .offset(y: 120)
+//                        .scaleEffect(0.8)
+                }
         }
+    }
+    
+    var game: some View {
+        PrismCanvas(tilt: tilt) {
+            Color.black.opacity(0.5)
+                .frame(
+                    width: CGFloat(world.width) * blockLength,
+                    height: CGFloat(world.height) * blockLength
+                )
+        }
+        .scaleEffect(y: 0.69)
     }
     
     var controls: some View {

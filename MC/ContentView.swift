@@ -219,11 +219,14 @@ struct ContentView: View {
             LinearGradient(colors: [.blue, .white, .white, .brown], startPoint: .top, endPoint: .bottom)
                 .opacity(0.2)
                 .background(Color.white)
-                .ignoresSafeArea()
                 .overlay {
                     game
                         .offset(y: 120)
                 }
+                .padding(.horizontal, -300)
+                .padding(.vertical, -200)
+                .drawingGroup()
+                .ignoresSafeArea()
         }
     }
     

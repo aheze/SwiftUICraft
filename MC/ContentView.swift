@@ -34,10 +34,29 @@ struct World {
     var height = 6
     var slots = [Slot]()
     
-    struct Coordinate: Hashable {
+    struct Coordinate: Hashable, Comparable {
         var row: Int
         var column: Int
         var levitation: Int
+        
+        static func < (lhs: World.Coordinate, rhs: World.Coordinate) -> Bool {
+            /// from https://sarunw.com/posts/how-to-sort-by-multiple-properties-in-swift/
+            let predicates: [(World.Coordinate, World.Coordinate) -> Bool] = [ // <2>
+                { $0.row < $1.row },
+                { $0.column < $1.column },
+                { $0.levitation < $1.levitation }
+            ]
+               
+            for predicate in predicates { // <3>
+                if !predicate(lhs, rhs), !predicate(rhs, lhs) { // <4>
+                    continue // <5>
+                }
+                   
+                return predicate(lhs, rhs) // <5>
+            }
+            
+            return false
+        }
     }
     
     struct Slot: Identifiable {
@@ -148,6 +167,7 @@ struct World {
             }
         }
         
+        slots = slots.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
         let world = World(slots: slots)
         
         return world
@@ -234,8 +254,16 @@ struct ContentView: View {
         /// only allow blocks to be placed, not other items
         guard selectedItem.previewBlock != nil else { return }
         
-        let slot = World.Slot(coordinate: coordinate, item: selectedItem)
-        world.slots.append(slot)
+        var slots = world.slots
+        DispatchQueue.global().async {
+            let slot = World.Slot(coordinate: coordinate, item: selectedItem)
+            slots.append(slot)
+            slots = slots.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
+            
+            DispatchQueue.main.async {
+                world.slots = slots
+            }
+        }
     }
     
     var game: some View {
@@ -450,6 +478,7 @@ struct Block: View {
                     Image(side)
                         .interpolation(.none)
                         .resizable()
+                        .brightness(-0.1)
                         .onTapGesture {
                             leftPressed()
                         }
@@ -468,6 +497,7 @@ struct Block: View {
                     Image(side)
                         .interpolation(.none)
                         .resizable()
+                        .brightness(-0.2)
                         .onTapGesture {
                             rightPressed()
                         }

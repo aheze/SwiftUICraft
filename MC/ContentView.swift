@@ -14,6 +14,7 @@ enum Direction {
     case right
     case down
     case left
+    case reset
     
     var rotation: CGFloat {
         switch self {
@@ -25,6 +26,8 @@ enum Direction {
             return 180
         case .left:
             return 270
+        case .reset:
+            return 0
         }
     }
 }
@@ -229,6 +232,8 @@ struct ContentView: View {
     @State var world = World.defaultWorld
     @State var selectedItem = Item.dirt
     @State var tilt = CGFloat(0.3)
+    @State var offset = CGSize.zero
+    
     let blockLength = CGFloat(50)
     
     var body: some View {
@@ -236,9 +241,7 @@ struct ContentView: View {
             controls
         }
         .background {
-            LinearGradient(colors: [.blue, .white, .white, .brown], startPoint: .top, endPoint: .bottom)
-                .opacity(0.2)
-                .background(Color.white)
+            Color.clear
                 .overlay {
                     game
                         .offset(y: 120)
@@ -246,6 +249,12 @@ struct ContentView: View {
                 .padding(.horizontal, -300)
                 .padding(.vertical, -200)
                 .drawingGroup()
+                .offset(offset)
+                .background {
+                    LinearGradient(colors: [.blue, .white, .white, .brown], startPoint: .top, endPoint: .bottom)
+                        .opacity(0.2)
+                        .background(Color.white)
+                }
                 .ignoresSafeArea()
         }
     }
@@ -324,17 +333,37 @@ struct ContentView: View {
                 Grid {
                     GridRow {
                         slot
-                        Switch(direction: .up)
+                        Switch(direction: .up) {
+                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                                offset.height += 100
+                            }
+                        }
                         slot
                     }
                     GridRow {
-                        Switch(direction: .left)
-                        slot
-                        Switch(direction: .right)
+                        Switch(direction: .left) {
+                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                                offset.width += 100
+                            }
+                        }
+                        Switch(direction: .reset) {
+                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                                offset = .zero
+                            }
+                        }
+                        Switch(direction: .right) {
+                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                                offset.width -= 100
+                            }
+                        }
                     }
                     GridRow {
                         slot
-                        Switch(direction: .down)
+                        Switch(direction: .down) {
+                            withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                                offset.height -= 100
+                            }
+                        }
                         slot
                     }
                 }
@@ -381,18 +410,25 @@ struct ContentView: View {
 
 struct Switch: View {
     var direction: Direction
+    var action: () -> Void
     
     var body: some View {
-        Button {} label: {
+        Button(action: action) {
             Image("button_background")
                 .interpolation(.none)
                 .resizable()
                 .frame(width: 70, height: 70)
                 .overlay {
-                    Image("button_arrow")
-                        .interpolation(.none)
-                        .resizable()
-                        .rotationEffect(.degrees(direction.rotation))
+                    if direction == .reset {
+                        Image("button_reset")
+                            .interpolation(.none)
+                            .resizable()
+                    } else {
+                        Image("button_arrow")
+                            .interpolation(.none)
+                            .resizable()
+                            .rotationEffect(.degrees(direction.rotation))
+                    }
                 }
         }
     }

@@ -165,12 +165,21 @@ struct ContentView: View {
             }
         }
         .overlay(alignment: .top) {
-            VStack(spacing: 2) {
-                Text("SWIFTUICRAFT")
-                    .font(.system(size: 40, weight: .heavy, design: .serif))
+            VStack(spacing: 1) {
+                HStack(spacing: 2) {
+                    Text("SWIFTUI")
+                        .foregroundColor(.orange)
+                        .brightness(0.6)
+                    
+                    Text("CRAFT")
+                        .foregroundColor(.white)
+                }
+                .font(.system(size: 40, weight: .heavy))
+                .shadow(color: .black, radius: 0, x: 3, y: 3)
+                .rotation3DEffect(.degrees(10), axis: (1, 0, 0), perspective: 2)
                 
                 Text("@aheze0")
-                    .font(.system(size: 16, weight: .heavy, design: .serif))
+                    .font(.system(size: 18, weight: .semibold))
                     .opacity(0.25)
             }
         }
@@ -302,7 +311,7 @@ struct BlockView: View {
             case .water:
                 Color.blue.opacity(0.3)
             case .waterSource:
-                Color.blue.brightness(-0.1).opacity(0.8)
+                Color.blue.brightness(-0.1).opacity(0.6)
             }
         }
     }
@@ -323,7 +332,7 @@ struct BlockView: View {
             case .water:
                 Color.blue.opacity(0.15)
             case .waterSource:
-                Color.blue.brightness(-0.1).opacity(0.55)
+                Color.blue.brightness(-0.1).opacity(0.35)
             }
         }
     }
@@ -344,7 +353,7 @@ struct BlockView: View {
             case .water:
                 Color.blue.opacity(0.1)
             case .waterSource:
-                Color.blue.brightness(-0.1).opacity(0.45)
+                Color.blue.brightness(-0.1).opacity(0.25)
             }
         }
     }

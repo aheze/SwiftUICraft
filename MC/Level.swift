@@ -44,7 +44,7 @@ extension Level {
                     }
                 }
             }
-         
+            
             /// jagged shape
             for row in 0..<height {
                 for column in 0..<10 {
@@ -116,7 +116,7 @@ extension Level {
             }
             
             blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
-            let world = World(blocks: blocks)
+            let world = World(width: width, height: height, blocks: blocks)
             return world
         }()
         
@@ -138,20 +138,19 @@ extension Level {
         
         return level
     }()
-    
+}
+
+extension Level {
     static let level2: Level = {
         let world: World = {
-            let width = 15
+            let width = 10
             let height = 6
             var blocks = [Block]()
             
-            /// base dirt layer
             for row in 0..<height {
                 for column in 0..<width {
-                    let shouldBeDirt = (column - (height - row)) < 3
-                    
                     let coordinate = Coordinate(row: row, column: column, levitation: 0)
-                    let block = Block(coordinate: coordinate, blockKind: shouldBeDirt ? .dirt : .grass)
+                    let block = Block(coordinate: coordinate, blockKind: .clay)
                     blocks.append(block)
                 }
             }
@@ -159,38 +158,58 @@ extension Level {
             /// jagged shape
             for row in 0..<height {
                 for column in 0..<10 {
-                    let shouldAdd = (column - (height - row)) < 3
+                    let shouldAdd = (column - (height - row)) < -2
                     
                     if shouldAdd {
                         let coordinate = Coordinate(row: row, column: column, levitation: 1)
-                        let block = Block(coordinate: coordinate, blockKind: .dirt)
+                        let block = Block(coordinate: coordinate, blockKind: .sand)
                         blocks.append(block)
                     }
                 }
             }
             
-            /// jagged shape
-            for row in 0..<height {
-                for column in 0..<10 {
-                    let shouldAdd = (column - (height - row)) < 0
-                    
-                    if shouldAdd {
-                        let coordinate = Coordinate(row: row, column: column, levitation: 2)
-                        let block = Block(coordinate: coordinate, blockKind: .grass)
-                        blocks.append(block)
-                    }
-                }
-            }
-            
-            /// fill in some more grass blocks at the bottom
-            for (x, y) in [(2, 4), (1, 5), (2, 5), (3, 5)] {
-                let coordinate = Coordinate(row: y, column: x, levitation: 2)
+            /// fill in some more sand blocks at the bottom
+            for (x, y) in [(0, 4), (0, 5), (1, 3), (1, 4), (1, 5), (2, 4), (2, 5)] {
+                let coordinate = Coordinate(row: y, column: x, levitation: 1)
                 let block = Block(coordinate: coordinate, blockKind: .grass)
                 blocks.append(block)
             }
             
+            for (x, y) in [
+                (4, 0), (5, 0), (6, 0), (7, 0),
+                (9, 0), (9, 1), (9, 2), (9, 3), (9, 4),
+                (8, 0), (8, 1), (8, 2), (8, 3),
+                (7, 0), (7, 1), (7, 2),
+            ] {
+                let coordinate = Coordinate(row: y, column: x, levitation: 1)
+                let block = Block(coordinate: coordinate, blockKind: .blackstone)
+                blocks.append(block)
+            }
+
+            for (x, y) in [
+                (9, 0), (9, 1), (9, 2),
+                (8, 0), (8, 1),
+                (7, 0),
+            ] {
+                let coordinate = Coordinate(row: y, column: x, levitation: 2)
+                let block = Block(coordinate: coordinate, blockKind: .blackstone)
+                blocks.append(block)
+            }
+            
+            _ = {
+                let coordinate = Coordinate(row: 0, column: 9, levitation: 3)
+                let block = Block(coordinate: coordinate, blockKind: .amethyst)
+                blocks.append(block)
+            }()
+            
+            _ = {
+                let coordinate = Coordinate(row: 0, column: 3, levitation: 2)
+                let block = Block(coordinate: coordinate, blockKind: .concrete)
+                blocks.append(block)
+            }()
+            
             blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
-            let world = World(blocks: blocks)
+            let world = World(width: width, height: height, blocks: blocks)
             return world
         }()
         

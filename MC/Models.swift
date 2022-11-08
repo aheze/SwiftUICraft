@@ -191,9 +191,9 @@ enum Texture {
 }
 
 struct World {
-    var width = 15
-    var height = 6
-    var blocks = [Block]()
+    var width: Int
+    var height: Int
+    var blocks: [Block]
 }
 
 struct Coordinate: Hashable, Comparable {

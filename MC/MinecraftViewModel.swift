@@ -89,7 +89,7 @@ extension MinecraftViewModel {
                             }
                         }()
                         
-                        try await Task.sleep(seconds: 0.1)
+                        try await Task.sleep(seconds: 0.06)
                     }
                 }
                 

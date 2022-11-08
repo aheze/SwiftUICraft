@@ -106,7 +106,9 @@ struct ContentView: View {
                                 blocks = blocks.filter { !$0.blockKind.isWater }
                                 
                                 DispatchQueue.main.async {
-                                    model.level.world.blocks = blocks
+                                    withAnimation {
+                                        model.level.world.blocks = blocks
+                                    }
                                 }
                             }
                         }

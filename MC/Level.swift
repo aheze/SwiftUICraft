@@ -204,9 +204,40 @@ extension Level {
             
             _ = {
                 let coordinate = Coordinate(row: 0, column: 3, levitation: 2)
-                let block = Block(coordinate: coordinate, blockKind: .concrete)
+                let block = Block(coordinate: coordinate, blockKind: .amethyst)
                 blocks.append(block)
             }()
+            
+            for (x, y, z) in [
+                (1, 0, 2), (0, 2, 2),
+                (0, 2, 3),
+            ] {
+                let coordinate = Coordinate(row: y, column: x, levitation: z)
+                let block = Block(coordinate: coordinate, blockKind: .cactus)
+                blocks.append(block)
+            }
+            
+            for (x, y, z) in [
+                (5, 4, 1), (5, 4, 2), (5, 4, 3),
+            ] {
+                let coordinate = Coordinate(row: y, column: x, levitation: z)
+                let block = Block(coordinate: coordinate, blockKind: .acaciaLog)
+                blocks.append(block)
+            }
+            
+            _ = {
+                let coordinate = Coordinate(row: 4, column: 5, levitation: 4)
+                let block = Block(coordinate: coordinate, blockKind: .acaciaPlanks)
+                blocks.append(block)
+            }()
+            
+            for (x, y) in [
+                (3, 1), (2, 2), (2, 3),
+            ] {
+                let coordinate = Coordinate(row: y, column: x, levitation: 1)
+                let block = Block(coordinate: coordinate, blockKind: .ice)
+                blocks.append(block)
+            }
             
             blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
             let world = World(width: width, height: height, blocks: blocks)

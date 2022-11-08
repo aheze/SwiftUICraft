@@ -23,6 +23,7 @@ enum Item: String, CaseIterable {
     case acaciaLog
     case acaciaPlanks
     case amethyst
+    case cactus
     
     case pick
     case sword
@@ -95,6 +96,8 @@ enum Item: String, CaseIterable {
             return .acaciaPlanks
         case .amethyst:
             return .amethyst
+        case .cactus:
+            return .cactus
         case .pick:
             return nil
         case .sword:
@@ -139,6 +142,7 @@ enum BlockKind: String, CaseIterable {
     case acaciaLog
     case acaciaPlanks
     case amethyst
+    case cactus
     
     case water
     case waterSource
@@ -171,6 +175,8 @@ enum BlockKind: String, CaseIterable {
             return .image("acacia_planks")
         case .amethyst:
             return .image("amethyst_block")
+        case .cactus:
+            return .differentSides(top: "cactus_top", sides: "cactus_side")
         case .water:
             return .water
         case .waterSource:

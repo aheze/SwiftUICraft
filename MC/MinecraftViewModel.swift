@@ -6,11 +6,10 @@
 //  Copyright © 2022 A. Zheng. All rights reserved.
 //
     
-
 import SwiftUI
 
 class MinecraftViewModel: ObservableObject {
-    @Published var world = World.defaultWorld
+    @Published var level = Level.level1
     @Published var selectedItem = Item.dirt
     @Published var offset = CGSize.zero
     
@@ -34,14 +33,14 @@ extension MinecraftViewModel {
         currentTask = nil
         
         if selectedItem == .bucket {
-            var blocks = world.blocks
+            var blocks = level.world.blocks
             DispatchQueue.global().async {
                 blocks = self.modifyWorldForWater(existingBlocks: blocks, at: coordinate, depth: 0, isInitial: true)
                 blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
                 blocks = blocks.uniqued()
 
                 DispatchQueue.main.async {
-                    self.world.blocks = blocks
+                    self.level.world.blocks = blocks
                 }
 
                 /**
@@ -71,12 +70,12 @@ extension MinecraftViewModel {
                         $0.2 < $1.2 /// sort by distance
                     }.group { $0.2 }
                 
-                self.currentTask = Task {
+                let task = Task {
                     for index in groupedBlocksCollection.indices {
                         try Task.checkCancellation()
                         
                         let groupedBlocks = groupedBlocksCollection[index]
-                        var blocks = self.world.blocks
+                        var blocks = self.level.world.blocks
                         for block in groupedBlocks {
                             let blockIndex = block.1
                             if blocks.indices.contains(blockIndex) {
@@ -84,12 +83,18 @@ extension MinecraftViewModel {
                             }
                         }
                         
-                        withAnimation(.spring(response: 0.2, dampingFraction: 1, blendDuration: 1)) {
-                            self.world.blocks = blocks
-                        }
+                        await { @MainActor in
+                            withAnimation(.spring(response: 0.2, dampingFraction: 1, blendDuration: 1)) {
+                                self.level.world.blocks = blocks
+                            }
+                        }()
                         
                         try await Task.sleep(seconds: 0.1)
                     }
+                }
+                
+                DispatchQueue.main.async {
+                    self.currentTask = task
                 }
             }
             
@@ -97,14 +102,14 @@ extension MinecraftViewModel {
             /// only allow blocks (items that have a block preview) to be placed, not other items
             guard let associatedBlockKind = selectedItem.associatedBlockKind else { return }
             
-            var blocks = world.blocks
+            var blocks = level.world.blocks
             DispatchQueue.global().async {
                 let block = Block(coordinate: coordinate, blockKind: associatedBlockKind)
                 blocks.append(block)
                 blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
                 
                 DispatchQueue.main.async {
-                    self.world.blocks = blocks
+                    self.level.world.blocks = blocks
                 }
             }
         }

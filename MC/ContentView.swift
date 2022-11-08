@@ -52,14 +52,14 @@ struct ContentView: View {
     var game: some View {
         PrismCanvas(tilt: model.tilt) {
             let size = CGSize(
-                width: CGFloat(model.world.width) * model.blockLength,
-                height: CGFloat(model.world.height) * model.blockLength
+                width: CGFloat(model.level.world.width) * model.blockLength,
+                height: CGFloat(model.level.world.height) * model.blockLength
             )
             
             PrismColorView(tilt: model.tilt, size: size, extrusion: 20, levitation: -20, color: Color.blue.opacity(0.5))
                 .overlay {
                     ZStack(alignment: .topLeading) {
-                        ForEach(model.world.blocks) { block in
+                        ForEach(model.level.world.blocks) { block in
                             BlockView(
                                 tilt: model.tilt,
                                 length: model.blockLength,
@@ -106,12 +106,12 @@ struct ContentView: View {
                 Grid {
                     GridRow {
                         KeyboardButton(key: .reset) {
-                            var blocks = model.world.blocks
+                            var blocks = model.level.world.blocks
                             DispatchQueue.global().async {
                                 blocks = blocks.filter { !$0.blockKind.isWater }
                                 
                                 DispatchQueue.main.async {
-                                    model.world.blocks = blocks
+                                    model.level.world.blocks = blocks
                                 }
                             }
                         }

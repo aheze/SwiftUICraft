@@ -25,6 +25,16 @@ enum Item: String, CaseIterable {
     case amethyst
     case cactus
     
+    case warpedStem
+    case crimsonStem
+    case guildedBlackstone
+    case glowstone
+    case netherBricks
+    case netherrack
+    case gold
+    case lavaBucket
+    case flintAndSteel
+    
     case pick
     case sword
     case bucket
@@ -45,6 +55,10 @@ enum Item: String, CaseIterable {
             return .image("water_bucket")
         case .beef:
             return .image("cooked_beef")
+        case .lavaBucket:
+            return .image("lava_bucket")
+        case .flintAndSteel:
+            return .image("flint_and_steel")
         default:
             if let associatedBlockKind {
                 return .blockView(
@@ -98,6 +112,24 @@ enum Item: String, CaseIterable {
             return .amethyst
         case .cactus:
             return .cactus
+        case .warpedStem:
+            return .warpedStem
+        case .crimsonStem:
+            return .crimsonStem
+        case .guildedBlackstone:
+            return .guildedBlackstone
+        case .glowstone:
+            return .glowstone
+        case .netherBricks:
+            return .netherBricks
+        case .netherrack:
+            return .netherrack
+        case .gold:
+            return .gold
+        case .lavaBucket:
+            return .lavaSource
+        case .flintAndSteel:
+            return .fire
         case .pick:
             return nil
         case .sword:
@@ -147,6 +179,17 @@ enum BlockKind: String, CaseIterable {
     case water
     case waterSource
     
+    case warpedStem
+    case crimsonStem
+    case guildedBlackstone
+    case glowstone
+    case netherBricks
+    case netherrack
+    case gold
+    case lava
+    case lavaSource
+    case fire
+    
     var texture: Texture {
         switch self {
         case .dirt:
@@ -181,11 +224,32 @@ enum BlockKind: String, CaseIterable {
             return .water
         case .waterSource:
             return .waterSource
+            
+        case .warpedStem:
+            return .differentSides(top: "warped_stem_top", sides: "warped_stem")
+        case .crimsonStem:
+            return .differentSides(top: "crimson_stem_top", sides: "crimson_stem")
+        case .guildedBlackstone:
+            return .image("gilded_blackstone")
+        case .glowstone:
+            return .image("glowstone")
+        case .netherBricks:
+            return .image("nether_bricks")
+        case .netherrack:
+            return .image("netherrack")
+        case .gold:
+            return .image("gold_block")
+        case .lava:
+            return .lavaSource
+        case .lavaSource:
+            return .lavaSource
+        case .fire:
+            return .fire
         }
     }
     
-    var isWater: Bool {
-        self == .water || self == .waterSource
+    var isLiquid: Bool {
+        self == .water || self == .waterSource || self == .lava || self == .lavaSource
     }
 }
 
@@ -194,6 +258,9 @@ enum Texture {
     case image(String)
     case water
     case waterSource
+    case fire
+    case lava
+    case lavaSource
 }
 
 struct World {
@@ -233,6 +300,7 @@ enum KeyboardKey {
     case pause
     case zoomIn
     case zoomOut
+    case reset
     
     enum Direction {
         case up
@@ -266,6 +334,8 @@ enum KeyboardKey {
             return "button_in"
         case .zoomOut:
             return "button_out"
+        case .reset:
+            return "button_reset"
         }
     }
 }

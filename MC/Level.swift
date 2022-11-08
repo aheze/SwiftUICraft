@@ -133,7 +133,7 @@ extension Level {
                 .beef,
             ],
             world: world,
-            background: [0x00C3FF, 0xFFFFFF, 0xFFFFFF, 0x7DA8FF]
+            background: [0x56B1DB, 0xFFFFFF, 0xFFFFFF, 0x96C9FD]
         )
         
         return level
@@ -257,7 +257,60 @@ extension Level {
                 .amethyst,
             ],
             world: world,
-            background: [0x00C3FF, 0xFFFFFF, 0xFFFFFF, 0xBC0011]
+            background: [0x4CCCDA, 0xFFFFFF, 0xFFFFFF, 0x8BDAC4]
+        )
+        
+        return level
+    }()
+}
+
+extension Level {
+    static let level3: Level = {
+        let world: World = {
+            let width = 12
+            let height = 8
+            var blocks = [Block]()
+            
+            for row in 0..<height {
+                for column in 0..<width {
+                    let coordinate = Coordinate(row: row, column: column, levitation: 0)
+                    let block = Block(coordinate: coordinate, blockKind: .netherrack)
+                    blocks.append(block)
+                }
+            }
+            
+            /// jagged shape
+            for row in 0..<height {
+                for column in 0..<10 {
+                    let shouldAdd = (column - (height - row)) < -2
+                    
+                    if shouldAdd {
+                        let coordinate = Coordinate(row: row, column: column, levitation: 1)
+                        let block = Block(coordinate: coordinate, blockKind: .netherrack)
+                        blocks.append(block)
+                    }
+                }
+            }
+            
+            blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
+            let world = World(width: width, height: height, blocks: blocks)
+            return world
+        }()
+        
+        let level = Level(
+            items: [
+                .warpedStem,
+                .crimsonStem,
+                .guildedBlackstone,
+                .glowstone,
+                .netherBricks,
+                .netherrack,
+                .gold,
+                .lavaBucket,
+                .flintAndSteel,
+            ],
+            world: world,
+            background: [0xFF2E00, 0x6B1500, 0x000000, 0x000000]
         )
         
         return level

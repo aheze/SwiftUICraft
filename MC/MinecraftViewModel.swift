@@ -10,7 +10,9 @@ import SwiftUI
 
 class MinecraftViewModel: ObservableObject {
     @Published var gameActive = true
-    @Published var level = Level.level1
+    
+    @Published var levels = [Level.level1, Level.level2, Level.level3]
+    @Published var selectedLevelIndex = 2
     @Published var selectedItem = Item.dirt
     @Published var offset = CGSize.zero
     
@@ -25,6 +27,14 @@ class MinecraftViewModel: ObservableObject {
         return tilt
     }
     
+    var level: Level {
+        get {
+            levels[selectedLevelIndex]
+        } set {
+            levels[selectedLevelIndex] = newValue
+        }
+    }
+    
     let blockLength = CGFloat(50)
 }
 
@@ -33,73 +43,12 @@ extension MinecraftViewModel {
         currentTask?.cancel()
         currentTask = nil
         
-        if selectedItem == .bucket {
-            var blocks = level.world.blocks
-            DispatchQueue.global().async {
-                blocks = self.modifyWorldForWater(existingBlocks: blocks, at: coordinate, depth: 0, isInitial: true)
-                blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
-                blocks = blocks.uniqued()
-
-                DispatchQueue.main.async {
-                    self.level.world.blocks = blocks
-                }
-
-                /**
-                 1. the block
-                 2. the block's index in `blocks`
-                 3. the block's planar distance from the source block
-                 */
-                let blocksWithIndicesAndDistance: [(Block, Int, Int)] = blocks.indices.compactMap { index in
-                    let block = blocks[index]
-                    
-                    if block.blockKind.isWater {
-                        return (
-                            block,
-                            index,
-                            DistanceSquared(
-                                from: (x: block.coordinate.column, y: block.coordinate.row),
-                                to: (x: coordinate.column, y: coordinate.row)
-                            )
-                        )
-                    } else {
-                        return nil
-                    }
-                }
-                
-                let groupedBlocksCollection = blocksWithIndicesAndDistance
-                    .sorted {
-                        $0.2 < $1.2 /// sort by distance
-                    }.group { $0.2 }
-                
-                let task = Task {
-                    for index in groupedBlocksCollection.indices {
-                        try Task.checkCancellation()
-                        
-                        let groupedBlocks = groupedBlocksCollection[index]
-                        var blocks = self.level.world.blocks
-                        for block in groupedBlocks {
-                            let blockIndex = block.1
-                            if blocks.indices.contains(blockIndex) {
-                                blocks[blockIndex].active = true
-                            }
-                        }
-                        
-                        await { @MainActor in
-                            withAnimation(.spring(response: 0.2, dampingFraction: 1, blendDuration: 1)) {
-                                self.level.world.blocks = blocks
-                            }
-                        }()
-                        
-                        try await Task.sleep(seconds: 0.06)
-                    }
-                }
-                
-                DispatchQueue.main.async {
-                    self.currentTask = task
-                }
-            }
-            
-        } else {
+        switch selectedItem {
+        case .bucket:
+            addLiquid(at: coordinate, initialBlockKind: .waterSource, blockKind: .water)
+        case .lavaBucket:
+            addLiquid(at: coordinate, initialBlockKind: .lavaSource, blockKind: .lava)
+        default:
             /// only allow blocks (items that have a block preview) to be placed, not other items
             guard let associatedBlockKind = selectedItem.associatedBlockKind else { return }
             
@@ -116,13 +65,88 @@ extension MinecraftViewModel {
         }
     }
     
-    func modifyWorldForWater(existingBlocks: [Block], at coordinate: Coordinate, depth: Int, isInitial: Bool = false) -> [Block] {
-        var waterSpread = 3
+    func addLiquid(at coordinate: Coordinate, initialBlockKind: BlockKind, blockKind: BlockKind) {
+        var blocks = level.world.blocks
+        DispatchQueue.global().async {
+            blocks = self.modifyWorldForLiquid(existingBlocks: blocks, isInitial: true, initialBlockKind: initialBlockKind, blockKind: blockKind, at: coordinate, depth: 0)
+            blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
+            blocks = blocks.uniqued()
+
+            DispatchQueue.main.async {
+                self.level.world.blocks = blocks
+            }
+
+            /**
+             1. the block
+             2. the block's index in `blocks`
+             3. the block's planar distance from the source block
+             */
+            let blocksWithIndicesAndDistance: [(Block, Int, Int)] = blocks.indices.compactMap { index in
+                let block = blocks[index]
+                
+                if block.blockKind.isLiquid {
+                    return (
+                        block,
+                        index,
+                        DistanceSquared(
+                            from: (x: block.coordinate.column, y: block.coordinate.row),
+                            to: (x: coordinate.column, y: coordinate.row)
+                        )
+                    )
+                } else {
+                    return nil
+                }
+            }
+            
+            let groupedBlocksCollection = blocksWithIndicesAndDistance
+                .sorted {
+                    $0.2 < $1.2 /// sort by distance
+                }.group { $0.2 }
+            
+            let task = Task {
+                for index in groupedBlocksCollection.indices {
+                    try Task.checkCancellation()
+                    
+                    let groupedBlocks = groupedBlocksCollection[index]
+                    var blocks = self.level.world.blocks
+                    for block in groupedBlocks {
+                        let blockIndex = block.1
+                        if blocks.indices.contains(blockIndex) {
+                            blocks[blockIndex].active = true
+                        }
+                    }
+                    
+                    await { @MainActor in
+                        withAnimation(.spring(response: 0.2, dampingFraction: 1, blendDuration: 1)) {
+                            self.level.world.blocks = blocks
+                        }
+                    }()
+                    
+                    try await Task.sleep(seconds: 0.06)
+                }
+            }
+            
+            DispatchQueue.main.async {
+                self.currentTask = task
+            }
+        }
+    }
+    
+    func modifyWorldForLiquid(
+        existingBlocks: [Block],
+        maximumSpread: Int = 3,
+        isInitial: Bool,
+        initialBlockKind: BlockKind,
+        blockKind: BlockKind,
+        at coordinate: Coordinate,
+        depth: Int
+    ) -> [Block] {
+        var liquidSpread = maximumSpread
         var existingBlocks = existingBlocks
         
         /// add a block if there's none there currently
         if !existingBlocks.contains(where: { $0.coordinate == coordinate }) {
-            /// otherwise, add water and sink it to the surface
+            /// otherwise, add liquid and sink it to the surface
             if let surface = existingBlocks.last(where: {
                 $0.coordinate.row == coordinate.row
                     && $0.coordinate.column == coordinate.column
@@ -130,9 +154,16 @@ extension MinecraftViewModel {
             }) {
                 let waterHeight = CGFloat(coordinate.levitation - surface.coordinate.levitation) - (0.2 + CGFloat(depth) * 0.2) /// make the extrusion larger
                 let waterAboveSurfaceCoordinate = Coordinate(row: coordinate.row, column: coordinate.column, levitation: surface.coordinate.levitation + 1)
-                let waterAboveSurface = Block(coordinate: waterAboveSurfaceCoordinate, blockKind: isInitial ? .waterSource : .water, extrusionPercentage: max(0, waterHeight), active: false)
+                let waterAboveSurface = Block(coordinate: waterAboveSurfaceCoordinate, blockKind: isInitial ? initialBlockKind : blockKind, extrusionPercentage: max(0, waterHeight), active: false)
                 existingBlocks.append(waterAboveSurface)
-                existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterAboveSurfaceCoordinate, depth: 0)
+                existingBlocks = modifyWorldForLiquid(
+                    existingBlocks: existingBlocks,
+                    isInitial: false,
+                    initialBlockKind: initialBlockKind,
+                    blockKind: blockKind,
+                    at: waterAboveSurfaceCoordinate,
+                    depth: 0
+                )
             }
         }
         
@@ -140,7 +171,7 @@ extension MinecraftViewModel {
         
         if
             depth == 0, /// only spread if the depth is 0 and the block underneath is land
-            existingBlocks.contains(where: { $0.coordinate == coordinateUnderneath && !$0.blockKind.isWater })
+            existingBlocks.contains(where: { $0.coordinate == coordinateUnderneath && !$0.blockKind.isLiquid })
         {
             /// check if current block is on a surface
             if existingBlocks.contains(where: {
@@ -161,20 +192,34 @@ extension MinecraftViewModel {
                 }
                 
                 if surroundingSurfaces.count < 5 {
-                    waterSpread = 1
+                    liquidSpread = 1
                 }
                 
-                for index in 0...waterSpread {
+                for index in 0...liquidSpread {
                     /// draw a diamond-shaped ring of blocks
                     for column in -index...index {
                         let rowOffset = index - abs(column)
-                        let waterCoordinate = Coordinate(row: coordinate.row + rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
-                        
-                        existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterCoordinate, depth: depth + index + 1)
+                        let liquidCoordinate = Coordinate(row: coordinate.row + rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
+                  
+                        existingBlocks = modifyWorldForLiquid(
+                            existingBlocks: existingBlocks,
+                            isInitial: false,
+                            initialBlockKind: initialBlockKind,
+                            blockKind: blockKind,
+                            at: liquidCoordinate,
+                            depth: depth + index + 1
+                        )
                             
                         if column != -index {
-                            let waterCoordinate = Coordinate(row: coordinate.row - rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
-                            existingBlocks = modifyWorldForWater(existingBlocks: existingBlocks, at: waterCoordinate, depth: depth + index + 1)
+                            let liquidCoordinate = Coordinate(row: coordinate.row - rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
+                            existingBlocks = modifyWorldForLiquid(
+                                existingBlocks: existingBlocks,
+                                isInitial: false,
+                                initialBlockKind: initialBlockKind,
+                                blockKind: blockKind,
+                                at: liquidCoordinate,
+                                depth: depth + index + 1
+                            )
                         }
                     }
                 }

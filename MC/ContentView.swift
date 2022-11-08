@@ -28,8 +28,6 @@ struct ContentView: View {
                 .drawingGroup()
                 .background {
                     LinearGradient(colors: model.level.background.map { Color(uiColor: .init(hex: $0)) }, startPoint: .top, endPoint: .bottom)
-                        .opacity(0.75)
-                        .background(Color.white)
                 }
                 .ignoresSafeArea()
                 .simultaneousGesture(
@@ -52,10 +50,10 @@ struct ContentView: View {
                                 model.gameActive = true
                             }
                             
-                            MenuButton(text: "Reset Water") {
+                            MenuButton(text: "Reset Liquids") {
                                 var blocks = model.level.world.blocks
                                 DispatchQueue.global().async {
-                                    blocks = blocks.filter { !$0.blockKind.isWater }
+                                    blocks = blocks.filter { !$0.blockKind.isLiquid }
     
                                     DispatchQueue.main.async {
                                         withAnimation {
@@ -66,16 +64,12 @@ struct ContentView: View {
                             }
                         }
                         
-                        VStack(spacing: 20) {
-                            MenuButton(text: "Level 1") {
-                                model.level = Level.level1
-                            }
-                            
-                            MenuButton(text: "Level 2") {
-                                model.level = Level.level2
-                            }
+                        VStack(alignment: .leading, spacing: 20) {
+                            levelButton(index: 0)
+                            levelButton(index: 1)
+                            levelButton(index: 2)
                         }
-                        .padding(12)
+                        .padding(16)
                         .background(Color.black.opacity(0.75))
                     }
                 }
@@ -89,6 +83,34 @@ struct ContentView: View {
         }
     }
     
+    func levelButton(index: Int) -> some View {
+        let active = model.selectedLevelIndex == index
+        
+        return HStack(spacing: 20) {
+            MenuButton(text: "Level \(index + 1)", active: active) {
+                model.selectedLevelIndex = index
+            }
+            
+            if active {
+                KeyboardButton(key: .reset) {
+                    let level: Level
+                    switch index {
+                    case 0:
+                        level = Level.level1
+                    case 1:
+                        level = Level.level2
+                    case 2:
+                        level = Level.level3
+                    default:
+                        fatalError("Level \(index) out of range.")
+                    }
+                    
+                    model.levels[index] = level
+                }
+            }
+        }
+    }
+    
     var game: some View {
         PrismCanvas(tilt: model.tilt) {
             let size = CGSize(
@@ -96,7 +118,7 @@ struct ContentView: View {
                 height: CGFloat(model.level.world.height) * model.blockLength
             )
             
-            PrismColorView(tilt: model.tilt, size: size, extrusion: 20, levitation: -20, color: Color.blue.opacity(0.5))
+            PrismColorView(tilt: model.tilt, size: size, extrusion: 20, levitation: -20, color: Color.white)
                 .overlay {
                     ZStack(alignment: .topLeading) {
                         ForEach(model.level.world.blocks) { block in
@@ -350,6 +372,12 @@ struct BlockView: View {
                 Color.blue.opacity(0.3)
             case .waterSource:
                 Color.blue.brightness(-0.1).opacity(0.6)
+            case .fire:
+                Color.red
+            case .lava:
+                Color.orange
+            case .lavaSource:
+                Color.red
             }
         }
     }
@@ -371,6 +399,12 @@ struct BlockView: View {
                 Color.blue.opacity(0.15)
             case .waterSource:
                 Color.blue.brightness(-0.1).opacity(0.35)
+            case .fire:
+                Color.red
+            case .lava:
+                Color.orange
+            case .lavaSource:
+                Color.red
             }
         }
     }
@@ -392,6 +426,12 @@ struct BlockView: View {
                 Color.blue.opacity(0.1)
             case .waterSource:
                 Color.blue.brightness(-0.1).opacity(0.25)
+            case .fire:
+                Color.red
+            case .lava:
+                Color.orange
+            case .lavaSource:
+                Color.red
             }
         }
     }
@@ -456,7 +496,7 @@ struct BlockView: View {
                 right
             }
         }
-        .allowsHitTesting(!block.blockKind.isWater)
+        .allowsHitTesting(!block.blockKind.isLiquid)
         .opacity(block.active ? 1 : 0)
     }
 }
@@ -471,7 +511,7 @@ struct MenuButton: View {
             Image("button_background")
                 .resizable()
                 .resizable(capInsets: EdgeInsets(top: 20, leading: 20, bottom: 20, trailing: 20), resizingMode: .stretch)
-                .frame(width: 300, height: 80)
+                .frame(width: 280, height: 70)
                 .overlay {
                     Text(text)
                         .font(.system(size: 24, weight: .bold, design: .monospaced))
@@ -482,8 +522,8 @@ struct MenuButton: View {
             if let active {
                 if active {
                     Rectangle()
-                        .strokeBorder(Color.white, lineWidth: 5)
-                        .padding(-5)
+                        .strokeBorder(Color.white, lineWidth: 6)
+                        .padding(-6)
                 }
             }
         }

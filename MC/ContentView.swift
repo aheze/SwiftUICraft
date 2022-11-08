@@ -10,7 +10,6 @@ import Prism
 import SwiftUI
 
 struct ContentView: View {
-
     @StateObject var model = MinecraftViewModel()
     
     var body: some View {
@@ -44,10 +43,6 @@ struct ContentView: View {
                 )
         }
     }
-    
-    
-    
-    
     
     var game: some View {
         PrismCanvas(tilt: model.tilt) {
@@ -181,7 +176,7 @@ struct ContentView: View {
         }
         .overlay(alignment: .bottomTrailing) {
             HStack(spacing: 0) {
-                ForEach(Item.allCases, id: \.rawValue) { item in
+                ForEach(model.level.items, id: \.rawValue) { item in
                     let selected = model.selectedItem == item
                         
                     Button {
@@ -418,4 +413,3 @@ struct BlockView: View {
         .opacity(block.active ? 1 : 0)
     }
 }
-

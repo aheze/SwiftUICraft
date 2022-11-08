@@ -117,7 +117,6 @@ extension Level {
             
             blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
             let world = World(blocks: blocks)
-            
             return world
         }()
         
@@ -132,6 +131,80 @@ extension Level {
                 .sword,
                 .bucket,
                 .beef,
+            ],
+            world: world,
+            background: []
+        )
+        
+        return level
+    }()
+    
+    static let level2: Level = {
+        let world: World = {
+            let width = 15
+            let height = 6
+            var blocks = [Block]()
+            
+            /// base dirt layer
+            for row in 0..<height {
+                for column in 0..<width {
+                    let shouldBeDirt = (column - (height - row)) < 3
+                    
+                    let coordinate = Coordinate(row: row, column: column, levitation: 0)
+                    let block = Block(coordinate: coordinate, blockKind: shouldBeDirt ? .dirt : .grass)
+                    blocks.append(block)
+                }
+            }
+            
+            /// jagged shape
+            for row in 0..<height {
+                for column in 0..<10 {
+                    let shouldAdd = (column - (height - row)) < 3
+                    
+                    if shouldAdd {
+                        let coordinate = Coordinate(row: row, column: column, levitation: 1)
+                        let block = Block(coordinate: coordinate, blockKind: .dirt)
+                        blocks.append(block)
+                    }
+                }
+            }
+            
+            /// jagged shape
+            for row in 0..<height {
+                for column in 0..<10 {
+                    let shouldAdd = (column - (height - row)) < 0
+                    
+                    if shouldAdd {
+                        let coordinate = Coordinate(row: row, column: column, levitation: 2)
+                        let block = Block(coordinate: coordinate, blockKind: .grass)
+                        blocks.append(block)
+                    }
+                }
+            }
+            
+            /// fill in some more grass blocks at the bottom
+            for (x, y) in [(2, 4), (1, 5), (2, 5), (3, 5)] {
+                let coordinate = Coordinate(row: y, column: x, levitation: 2)
+                let block = Block(coordinate: coordinate, blockKind: .grass)
+                blocks.append(block)
+            }
+            
+            blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
+            let world = World(blocks: blocks)
+            return world
+        }()
+        
+        let level = Level(
+            items: [
+                .bucket,
+                .ice,
+                .concrete,
+                .blackstone,
+                .clay,
+                .sand,
+                .acaciaLog,
+                .acaciaPlanks,
+                .amethyst,
             ],
             world: world,
             background: []

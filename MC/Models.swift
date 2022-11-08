@@ -230,7 +230,7 @@ struct Coordinate: Hashable, Comparable {
 enum KeyboardKey {
     case direction(Direction)
     case center
-    case reset
+    case pause
     case zoomIn
     case zoomOut
     
@@ -260,8 +260,8 @@ enum KeyboardKey {
             return "button_arrow"
         case .center:
             return "button_center"
-        case .reset:
-            return "button_reset"
+        case .pause:
+            return "button_pause"
         case .zoomIn:
             return "button_in"
         case .zoomOut:

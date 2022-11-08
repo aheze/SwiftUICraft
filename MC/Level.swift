@@ -133,7 +133,7 @@ extension Level {
                 .beef,
             ],
             world: world,
-            background: []
+            background: [0x00C3FF, 0xFFFFFF, 0xFFFFFF, 0x7DA8FF]
         )
         
         return level
@@ -257,7 +257,7 @@ extension Level {
                 .amethyst,
             ],
             world: world,
-            background: []
+            background: [0x00C3FF, 0xFFFFFF, 0xFFFFFF, 0xBC0011]
         )
         
         return level

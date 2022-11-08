@@ -9,7 +9,8 @@
 import SwiftUI
 
 class MinecraftViewModel: ObservableObject {
-    @Published var level = Level.level2
+    @Published var gameActive = true
+    @Published var level = Level.level1
     @Published var selectedItem = Item.dirt
     @Published var offset = CGSize.zero
     

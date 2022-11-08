@@ -15,6 +15,7 @@ struct ContentView: View {
     var body: some View {
         Color.clear.overlay {
             controls
+                .opacity(model.gameActive ? 1 : 0)
         }
         .background {
             Color.clear
@@ -26,7 +27,7 @@ struct ContentView: View {
                 .offset(model.offset)
                 .drawingGroup()
                 .background {
-                    LinearGradient(colors: [.blue, .white, .white, .brown], startPoint: .top, endPoint: .bottom)
+                    LinearGradient(colors: model.level.background.map { Color(uiColor: .init(hex: $0)) }, startPoint: .top, endPoint: .bottom)
                         .opacity(0.75)
                         .background(Color.white)
                 }
@@ -41,6 +42,50 @@ struct ContentView: View {
                             model.additionalTranslation = 0
                         }
                 )
+        }
+        .overlay {
+            if !model.gameActive {
+                Color.clear.overlay {
+                    HStack(alignment: .top, spacing: 24) {
+                        VStack(spacing: 10) {
+                            MenuButton(text: "Resume") {
+                                model.gameActive = true
+                            }
+                            
+                            MenuButton(text: "Reset Water") {
+                                var blocks = model.level.world.blocks
+                                DispatchQueue.global().async {
+                                    blocks = blocks.filter { !$0.blockKind.isWater }
+    
+                                    DispatchQueue.main.async {
+                                        withAnimation {
+                                            model.level.world.blocks = blocks
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        VStack(spacing: 20) {
+                            MenuButton(text: "Level 1") {
+                                model.level = Level.level1
+                            }
+                            
+                            MenuButton(text: "Level 2") {
+                                model.level = Level.level2
+                            }
+                        }
+                        .padding(12)
+                        .background(Color.black.opacity(0.75))
+                    }
+                }
+            
+                .background {
+                    Color.black
+                        .opacity(0.5)
+                        .ignoresSafeArea()
+                }
+            }
         }
     }
     
@@ -100,17 +145,8 @@ struct ContentView: View {
             HStack {
                 Grid {
                     GridRow {
-                        KeyboardButton(key: .reset) {
-                            var blocks = model.level.world.blocks
-                            DispatchQueue.global().async {
-                                blocks = blocks.filter { !$0.blockKind.isWater }
-                                
-                                DispatchQueue.main.async {
-                                    withAnimation {
-                                        model.level.world.blocks = blocks
-                                    }
-                                }
-                            }
+                        KeyboardButton(key: .pause) {
+                            model.gameActive = false
                         }
                         KeyboardButton(key: .zoomOut) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
@@ -422,5 +458,34 @@ struct BlockView: View {
         }
         .allowsHitTesting(!block.blockKind.isWater)
         .opacity(block.active ? 1 : 0)
+    }
+}
+
+struct MenuButton: View {
+    var text: String
+    var active: Bool? = nil
+    var action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Image("button_background")
+                .resizable()
+                .resizable(capInsets: EdgeInsets(top: 20, leading: 20, bottom: 20, trailing: 20), resizingMode: .stretch)
+                .frame(width: 300, height: 80)
+                .overlay {
+                    Text(text)
+                        .font(.system(size: 24, weight: .bold, design: .monospaced))
+                        .foregroundColor(.black.opacity(0.75))
+                }
+        }
+        .overlay {
+            if let active {
+                if active {
+                    Rectangle()
+                        .strokeBorder(Color.white, lineWidth: 5)
+                        .padding(-5)
+                }
+            }
+        }
     }
 }

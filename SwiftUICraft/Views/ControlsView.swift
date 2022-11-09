@@ -18,7 +18,7 @@ struct ControlsView: View {
                 Grid {
                     GridRow {
                         ControlView(control: .pause) {
-                            model.gameActive = false
+                            model.status = .paused
                         }
                         ControlView(control: .zoomOut) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {

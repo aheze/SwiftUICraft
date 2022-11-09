@@ -16,7 +16,7 @@ struct MenuView: View {
             HStack(alignment: .top, spacing: 24) {
                 VStack(spacing: 20) {
                     MenuButton(text: "Resume") {
-                        model.gameActive = true
+                        model.status = .playing
                     }
 
                     MenuButton(text: "Reset Liquids") {

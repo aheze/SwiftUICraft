@@ -26,6 +26,7 @@
 		3CC25B85291C27F10008449D /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B84291C27F10008449D /* MenuView.swift */; };
 		3CC25B87291C285D0008449D /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B86291C285D0008449D /* GameView.swift */; };
 		3CC25B89291C28AC0008449D /* ControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B88291C28AC0008449D /* ControlsView.swift */; };
+		3CC25B8C291C29A70008449D /* GameStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B8B291C29A70008449D /* GameStatus.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +49,7 @@
 		3CC25B84291C27F10008449D /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		3CC25B86291C285D0008449D /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		3CC25B88291C28AC0008449D /* ControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlsView.swift; sourceTree = "<group>"; };
+		3CC25B8B291C29A70008449D /* GameStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStatus.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +94,7 @@
 		3CC25B70291C263B0008449D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				3CC25B8B291C29A70008449D /* GameStatus.swift */,
 				3CB363492919DD9000737CF5 /* Level.swift */,
 				3CC25B77291C266F0008449D /* World.swift */,
 				3CC25B79291C267B0008449D /* Coordinate.swift */,
@@ -215,6 +218,7 @@
 				3CB363442919DBF900737CF5 /* ViewModel.swift in Sources */,
 				3CC25B85291C27F10008449D /* MenuView.swift in Sources */,
 				3CC25B81291C27D20008449D /* ItemView.swift in Sources */,
+				3CC25B8C291C29A70008449D /* GameStatus.swift in Sources */,
 				3CC25B72291C26420008449D /* Item.swift in Sources */,
 				3CB363482919DC3800737CF5 /* Utilities.swift in Sources */,
 				3CC25B87291C285D0008449D /* GameView.swift in Sources */,

@@ -9,7 +9,8 @@
 import SwiftUI
 
 class ViewModel: ObservableObject {
-    @Published var gameActive = true
+    
+    @Published var status = GameStatus.playing
     
     @Published var levels = [Level.level1, Level.level2, Level.level3]
     @Published var selectedLevelIndex = 2

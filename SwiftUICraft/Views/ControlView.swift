@@ -18,7 +18,7 @@ struct ControlView: View {
             Image("button_background")
                 .interpolation(.none)
                 .resizable()
-                .frame(width: 70, height: 70)
+                .frame(width: 60, height: 60)
                 .overlay {
                     if case let .direction(direction) = control {
                         Image(control.image)

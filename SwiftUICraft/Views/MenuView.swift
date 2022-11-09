@@ -11,10 +11,18 @@ import SwiftUI
 /// The game menu that displays when `model.status == .paused`.
 struct MenuView: View {
     @ObservedObject var model: ViewModel
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.verticalSizeClass) var verticalSizeClass
 
     var body: some View {
+        let largeWidth = horizontalSizeClass == .regular || verticalSizeClass == .compact
+
         Color.clear.overlay {
-            HStack(alignment: .top, spacing: 24) {
+            let layout = largeWidth
+                ? AnyLayout(HStackLayout(alignment: .top, spacing: 30))
+                : AnyLayout(VStackLayout(alignment: .leading, spacing: 40))
+
+            layout {
                 VStack(spacing: 20) {
                     MenuButton(text: "Resume") {
                         model.status = .playing
@@ -39,8 +47,10 @@ struct MenuView: View {
                     levelButton(index: 1)
                     levelButton(index: 2)
                 }
-                .padding(16)
-                .background(Color.black.opacity(0.75))
+                .background(
+                    Color.black.opacity(0.75)
+                        .padding(-16)
+                )
             }
         }
         .background {
@@ -91,7 +101,7 @@ struct MenuButton: View {
             Image("button_background")
                 .resizable()
                 .resizable(capInsets: EdgeInsets(top: 20, leading: 20, bottom: 20, trailing: 20), resizingMode: .stretch)
-                .frame(width: 280, height: 70)
+                .frame(width: 280, height: 60)
                 .overlay {
                     Text(text)
                         .font(.system(size: 24, weight: .bold, design: .monospaced))

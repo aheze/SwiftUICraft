@@ -307,7 +307,7 @@ extension Level {
                 .netherrack,
                 .gold,
                 .lavaBucket,
-                .flintAndSteel,
+                .laser,
             ],
             world: world,
             background: [0xFF2E00, 0x6B1500, 0x000000, 0x000000]

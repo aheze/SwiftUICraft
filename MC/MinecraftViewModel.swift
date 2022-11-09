@@ -117,12 +117,12 @@ extension MinecraftViewModel {
                     }
                     
                     await { @MainActor in
-                        withAnimation(.spring(response: 0.2, dampingFraction: 1, blendDuration: 1)) {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 0.4, blendDuration: 1)) {
                             self.level.world.blocks = blocks
                         }
                     }()
                     
-                    try await Task.sleep(seconds: 0.06)
+                    try await Task.sleep(seconds: 0.02)
                 }
             }
             

@@ -33,7 +33,7 @@ enum Item: String, CaseIterable {
     case netherrack
     case gold
     case lavaBucket
-    case flintAndSteel
+    case laser
     
     case pick
     case sword
@@ -57,8 +57,8 @@ enum Item: String, CaseIterable {
             return .image("cooked_beef")
         case .lavaBucket:
             return .image("lava_bucket")
-        case .flintAndSteel:
-            return .image("flint_and_steel")
+        case .laser:
+            return .image("laser")
         default:
             if let associatedBlockKind {
                 return .blockView(
@@ -128,8 +128,8 @@ enum Item: String, CaseIterable {
             return .gold
         case .lavaBucket:
             return .lavaSource
-        case .flintAndSteel:
-            return .fire
+        case .laser:
+            return .laser
         case .pick:
             return nil
         case .sword:
@@ -188,7 +188,7 @@ enum BlockKind: String, CaseIterable {
     case gold
     case lava
     case lavaSource
-    case fire
+    case laser
     
     var texture: Texture {
         switch self {
@@ -243,8 +243,8 @@ enum BlockKind: String, CaseIterable {
             return .lavaSource
         case .lavaSource:
             return .lavaSource
-        case .fire:
-            return .fire
+        case .laser:
+            return .laser
         }
     }
     
@@ -258,7 +258,7 @@ enum Texture {
     case image(String)
     case water
     case waterSource
-    case fire
+    case laser
     case lava
     case lavaSource
 }

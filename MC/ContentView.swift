@@ -372,8 +372,8 @@ struct BlockView: View {
                 Color.blue.opacity(0.3)
             case .waterSource:
                 Color.blue.brightness(-0.1).opacity(0.6)
-            case .fire:
-                Color.red
+            case .laser:
+                Color.yellow.opacity(0.5)
             case .lava:
                 Color.orange
             case .lavaSource:
@@ -399,8 +399,8 @@ struct BlockView: View {
                 Color.blue.opacity(0.15)
             case .waterSource:
                 Color.blue.brightness(-0.1).opacity(0.35)
-            case .fire:
-                Color.red
+            case .laser:
+                Color.yellow.opacity(0.3)
             case .lava:
                 Color.orange
             case .lavaSource:
@@ -426,8 +426,8 @@ struct BlockView: View {
                 Color.blue.opacity(0.1)
             case .waterSource:
                 Color.blue.brightness(-0.1).opacity(0.25)
-            case .fire:
-                Color.red
+            case .laser:
+                Color.yellow.opacity(0.2)
             case .lava:
                 Color.orange
             case .lavaSource:
@@ -438,14 +438,30 @@ struct BlockView: View {
     
     var body: some View {
         let extrusion: CGFloat = {
-            if block.active {
-                return length * block.extrusionPercentage
-            } else {
-                if block.extrusionPercentage > 1 {
-                    return length * 0.2 /// water in the air
+            if block.blockKind == .laser {
+                if block.active {
+                    return length * 10
                 } else {
-                    return 0 /// water on ground
+                    return length * 0.2
                 }
+            } else {
+                if block.active {
+                    return length * block.extrusionPercentage
+                } else {
+                    if block.extrusionPercentage > 1 {
+                        return length * 0.2 /// water in the air
+                    } else {
+                        return 0 /// water on ground
+                    }
+                }
+            }
+        }()
+        
+        let adjustedLength: CGFloat = {
+            if block.blockKind == .laser {
+                return length * 0.5
+            } else {
+                return length
             }
         }()
         
@@ -463,7 +479,7 @@ struct BlockView: View {
         
         PrismView(
             tilt: tilt,
-            size: .init(width: length, height: length),
+            size: .init(width: adjustedLength, height: adjustedLength),
             extrusion: extrusion,
             levitation: adjustedLevitation,
             shadowOpacity: 0.25
@@ -496,6 +512,7 @@ struct BlockView: View {
                 right
             }
         }
+        .frame(width: length, height: length)
         .allowsHitTesting(!block.blockKind.isLiquid)
         .opacity(block.active ? 1 : 0)
     }

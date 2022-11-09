@@ -1,5 +1,5 @@
 //
-//  MinecraftViewModel.swift
+//  ViewModel.swift
 //  SwiftUICraft
 //
 //  Created by A. Zheng (github.com/aheze) on 11/7/22.
@@ -8,7 +8,7 @@
     
 import SwiftUI
 
-class MinecraftViewModel: ObservableObject {
+class ViewModel: ObservableObject {
     @Published var gameActive = true
     
     @Published var levels = [Level.level1, Level.level2, Level.level3]
@@ -38,7 +38,7 @@ class MinecraftViewModel: ObservableObject {
     let blockLength = CGFloat(50)
 }
 
-extension MinecraftViewModel {
+extension ViewModel {
     func addBlock(at coordinate: Coordinate) {
         currentTask?.cancel()
         currentTask = nil

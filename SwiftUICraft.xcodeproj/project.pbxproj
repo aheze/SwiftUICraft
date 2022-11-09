@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3CB363442919DBF900737CF5 /* MinecraftViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB363432919DBF900737CF5 /* MinecraftViewModel.swift */; };
-		3CB363462919DC0600737CF5 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB363452919DC0600737CF5 /* Models.swift */; };
+		3CB363442919DBF900737CF5 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB363432919DBF900737CF5 /* ViewModel.swift */; };
 		3CB363482919DC3800737CF5 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB363472919DC3800737CF5 /* Utilities.swift */; };
 		3CB3634A2919DD9000737CF5 /* Level.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB363492919DD9000737CF5 /* Level.swift */; };
 		3CBC12812918B0A300D9DB0E /* SwiftUICraftApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CBC12802918B0A300D9DB0E /* SwiftUICraftApp.swift */; };
@@ -21,11 +20,16 @@
 		3CC25B78291C266F0008449D /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B77291C266F0008449D /* World.swift */; };
 		3CC25B7A291C267B0008449D /* Coordinate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B79291C267B0008449D /* Coordinate.swift */; };
 		3CC25B7C291C26910008449D /* Control.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B7B291C26910008449D /* Control.swift */; };
+		3CC25B7F291C27C70008449D /* ControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B7E291C27C70008449D /* ControlView.swift */; };
+		3CC25B81291C27D20008449D /* ItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B80291C27D20008449D /* ItemView.swift */; };
+		3CC25B83291C27DC0008449D /* BlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B82291C27DC0008449D /* BlockView.swift */; };
+		3CC25B85291C27F10008449D /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B84291C27F10008449D /* MenuView.swift */; };
+		3CC25B87291C285D0008449D /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B86291C285D0008449D /* GameView.swift */; };
+		3CC25B89291C28AC0008449D /* ControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B88291C28AC0008449D /* ControlsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		3CB363432919DBF900737CF5 /* MinecraftViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinecraftViewModel.swift; sourceTree = "<group>"; };
-		3CB363452919DC0600737CF5 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		3CB363432919DBF900737CF5 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		3CB363472919DC3800737CF5 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		3CB363492919DD9000737CF5 /* Level.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Level.swift; sourceTree = "<group>"; };
 		3CBC127D2918B0A300D9DB0E /* SwiftUICraft.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUICraft.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -38,6 +42,12 @@
 		3CC25B77291C266F0008449D /* World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = World.swift; sourceTree = "<group>"; };
 		3CC25B79291C267B0008449D /* Coordinate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinate.swift; sourceTree = "<group>"; };
 		3CC25B7B291C26910008449D /* Control.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Control.swift; sourceTree = "<group>"; };
+		3CC25B7E291C27C70008449D /* ControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlView.swift; sourceTree = "<group>"; };
+		3CC25B80291C27D20008449D /* ItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemView.swift; sourceTree = "<group>"; };
+		3CC25B82291C27DC0008449D /* BlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockView.swift; sourceTree = "<group>"; };
+		3CC25B84291C27F10008449D /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
+		3CC25B86291C285D0008449D /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
+		3CC25B88291C28AC0008449D /* ControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,13 +81,9 @@
 		3CBC127F2918B0A300D9DB0E /* SwiftUICraft */ = {
 			isa = PBXGroup;
 			children = (
-				3CBC12802918B0A300D9DB0E /* SwiftUICraftApp.swift */,
-				3CB363452919DC0600737CF5 /* Models.swift */,
+				3CC25B8A291C29070008449D /* App */,
 				3CC25B70291C263B0008449D /* Models */,
-				3CBC12822918B0A300D9DB0E /* ContentView.swift */,
-				3CB363432919DBF900737CF5 /* MinecraftViewModel.swift */,
-				3CB363492919DD9000737CF5 /* Level.swift */,
-				3CB363472919DC3800737CF5 /* Utilities.swift */,
+				3CC25B7D291C27B40008449D /* Views */,
 				3CBC12842918B0A400D9DB0E /* Assets.xcassets */,
 			);
 			path = SwiftUICraft;
@@ -86,14 +92,39 @@
 		3CC25B70291C263B0008449D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				3CB363492919DD9000737CF5 /* Level.swift */,
+				3CC25B77291C266F0008449D /* World.swift */,
+				3CC25B79291C267B0008449D /* Coordinate.swift */,
 				3CC25B71291C26420008449D /* Item.swift */,
 				3CC25B73291C26540008449D /* Block.swift */,
 				3CC25B75291C265E0008449D /* Texture.swift */,
-				3CC25B77291C266F0008449D /* World.swift */,
-				3CC25B79291C267B0008449D /* Coordinate.swift */,
 				3CC25B7B291C26910008449D /* Control.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		3CC25B7D291C27B40008449D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				3CBC12822918B0A300D9DB0E /* ContentView.swift */,
+				3CC25B86291C285D0008449D /* GameView.swift */,
+				3CC25B88291C28AC0008449D /* ControlsView.swift */,
+				3CC25B7E291C27C70008449D /* ControlView.swift */,
+				3CC25B80291C27D20008449D /* ItemView.swift */,
+				3CC25B82291C27DC0008449D /* BlockView.swift */,
+				3CC25B84291C27F10008449D /* MenuView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		3CC25B8A291C29070008449D /* App */ = {
+			isa = PBXGroup;
+			children = (
+				3CBC12802918B0A300D9DB0E /* SwiftUICraftApp.swift */,
+				3CB363432919DBF900737CF5 /* ViewModel.swift */,
+				3CB363472919DC3800737CF5 /* Utilities.swift */,
+			);
+			path = App;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -175,14 +206,19 @@
 				3CC25B74291C26540008449D /* Block.swift in Sources */,
 				3CBC12832918B0A300D9DB0E /* ContentView.swift in Sources */,
 				3CBC12812918B0A300D9DB0E /* SwiftUICraftApp.swift in Sources */,
+				3CC25B89291C28AC0008449D /* ControlsView.swift in Sources */,
+				3CC25B83291C27DC0008449D /* BlockView.swift in Sources */,
+				3CC25B7F291C27C70008449D /* ControlView.swift in Sources */,
 				3CC25B78291C266F0008449D /* World.swift in Sources */,
 				3CC25B7C291C26910008449D /* Control.swift in Sources */,
 				3CC25B7A291C267B0008449D /* Coordinate.swift in Sources */,
-				3CB363442919DBF900737CF5 /* MinecraftViewModel.swift in Sources */,
+				3CB363442919DBF900737CF5 /* ViewModel.swift in Sources */,
+				3CC25B85291C27F10008449D /* MenuView.swift in Sources */,
+				3CC25B81291C27D20008449D /* ItemView.swift in Sources */,
 				3CC25B72291C26420008449D /* Item.swift in Sources */,
 				3CB363482919DC3800737CF5 /* Utilities.swift in Sources */,
+				3CC25B87291C285D0008449D /* GameView.swift in Sources */,
 				3CC25B76291C265E0008449D /* Texture.swift in Sources */,
-				3CB363462919DC0600737CF5 /* Models.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

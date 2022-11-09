@@ -61,27 +61,33 @@ struct GameView: View {
                                 length: model.blockLength,
                                 levitation: CGFloat(block.coordinate.levitation) * model.blockLength,
                                 block: block
-                            ) /** topPressed */ {
+                            ) /** topTapped */ {
                                 let coordinate = Coordinate(
                                     row: block.coordinate.row,
                                     column: block.coordinate.column,
                                     levitation: block.coordinate.levitation + 1
                                 )
                                 model.addBlock(at: coordinate)
-                            } leftPressed: {
+                            } leftTapped: {
                                 let coordinate = Coordinate(
                                     row: block.coordinate.row + 1,
                                     column: block.coordinate.column,
                                     levitation: block.coordinate.levitation
                                 )
                                 model.addBlock(at: coordinate)
-                            } rightPressed: {
+                            } rightTapped: {
                                 let coordinate = Coordinate(
                                     row: block.coordinate.row,
                                     column: block.coordinate.column + 1,
                                     levitation: block.coordinate.levitation
                                 )
                                 model.addBlock(at: coordinate)
+                            } topHeld: {
+                                model.removeBlock(at: block.coordinate)
+                            } leftHeld: {
+                                model.removeBlock(at: block.coordinate)
+                            } rightHeld: {
+                                model.removeBlock(at: block.coordinate)
                             }
                             .offset( /// Position the block.
                                 x: CGFloat(block.coordinate.column) * model.blockLength,

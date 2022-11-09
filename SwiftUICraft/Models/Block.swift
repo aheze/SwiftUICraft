@@ -12,8 +12,19 @@ import SwiftUI
 struct Block: Hashable {
     var coordinate: Coordinate
     var blockKind: BlockKind
-    var extrusionPercentage = CGFloat(1)
+    
+    /**
+     Multiply the extrusion by this.
+     
+     Used for extending a block's height past a cube, for liquids and lasers.
+     */
+    var extrusionMultiplier = CGFloat(1)
+    
+    /// If the block is shown. For liquids, this will initially be `false`.
     var active = true
+    
+    /// How long you should hold a block to break it.
+    let holdDurationForRemoval = CGFloat(0.3)
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(coordinate)

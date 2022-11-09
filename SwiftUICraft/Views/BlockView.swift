@@ -20,9 +20,12 @@ struct BlockView: View {
     var levitation: CGFloat
     var block: Block
     
-    var topPressed: (() -> Void)?
-    var leftPressed: (() -> Void)?
-    var rightPressed: (() -> Void)?
+    var topTapped: (() -> Void)?
+    var leftTapped: (() -> Void)?
+    var rightTapped: (() -> Void)?
+    var topHeld: (() -> Void)?
+    var leftHeld: (() -> Void)?
+    var rightHeld: (() -> Void)?
     
     @State var animated = false
 
@@ -44,7 +47,9 @@ struct BlockView: View {
             case .laser:
                 Color.yellow.opacity(0.5)
             case .lava:
-                let delay = abs(block.extrusionPercentage - 1) / CGFloat(0.6)
+                
+                /// Make the hue change in a ripple.
+                let delay = abs(block.extrusionMultiplier - 1) / CGFloat(0.6)
                 
                 LinearGradient(colors: [.red, .orange], startPoint: .topLeading, endPoint: .bottomTrailing)
                     .opacity(0.8)
@@ -160,9 +165,9 @@ struct BlockView: View {
                 }
             } else {
                 if block.active {
-                    return length * block.extrusionPercentage
+                    return length * block.extrusionMultiplier
                 } else {
-                    if block.extrusionPercentage > 1 {
+                    if block.extrusionMultiplier > 1 {
                         return length * 0.2 /// water in the air
                     } else {
                         return 0 /// water on ground
@@ -183,8 +188,8 @@ struct BlockView: View {
             if block.active {
                 return levitation
             } else {
-                if block.extrusionPercentage > 1 {
-                    return levitation + length * (block.extrusionPercentage - 0.2)
+                if block.extrusionMultiplier > 1 {
+                    return levitation + length * (block.extrusionMultiplier - 0.2)
                 } else {
                     return levitation
                 }
@@ -198,29 +203,38 @@ struct BlockView: View {
             levitation: adjustedLevitation,
             shadowOpacity: 0.25
         ) {
-            if let topPressed {
+            if let topTapped, let topHeld {
                 top
                     .onTapGesture {
-                        topPressed()
+                        topTapped()
+                    }
+                    .onLongPressGesture(minimumDuration: block.holdDurationForRemoval) {
+                        topHeld()
                     }
             } else {
                 top
             }
             
         } left: {
-            if let leftPressed {
+            if let leftTapped, let leftHeld {
                 left
                     .onTapGesture {
-                        leftPressed()
+                        leftTapped()
+                    }
+                    .onLongPressGesture(minimumDuration: block.holdDurationForRemoval) {
+                        leftHeld()
                     }
             } else {
                 left
             }
         } right: {
-            if let rightPressed {
+            if let rightTapped, let rightHeld {
                 right
                     .onTapGesture {
-                        rightPressed()
+                        rightTapped()
+                    }
+                    .onLongPressGesture(minimumDuration: block.holdDurationForRemoval) {
+                        rightHeld()
                     }
             } else {
                 right

@@ -186,7 +186,7 @@ extension ViewModel {
             }) {
                 let waterHeight = CGFloat(coordinate.levitation - surface.coordinate.levitation) - (0.2 + CGFloat(depth) * 0.2) /// make the extrusion larger
                 let waterAboveSurfaceCoordinate = Coordinate(row: coordinate.row, column: coordinate.column, levitation: surface.coordinate.levitation + 1)
-                let waterAboveSurface = Block(coordinate: waterAboveSurfaceCoordinate, blockKind: isInitial ? initialBlockKind : blockKind, extrusionPercentage: max(0, waterHeight), active: false)
+                let waterAboveSurface = Block(coordinate: waterAboveSurfaceCoordinate, blockKind: isInitial ? initialBlockKind : blockKind, extrusionMultiplier: max(0, waterHeight), active: false)
                 existingBlocks.append(waterAboveSurface)
                 existingBlocks = modifyWorldForLiquid(
                     existingBlocks: existingBlocks,
@@ -263,5 +263,26 @@ extension ViewModel {
         }
         
         return existingBlocks
+    }
+}
+
+extension ViewModel {
+    /// Add the current selected item at a coordinate.
+    func removeBlock(at coordinate: Coordinate) {
+        /// Cancel existing animations if there's any.
+        currentLiquidAnimationTask?.cancel()
+        currentLiquidAnimationTask = nil
+        
+        var blocks = level.world.blocks
+        DispatchQueue.global().async {
+            /// Prevent duplicates.
+            if let firstIndex = blocks.firstIndex(where: { $0.coordinate == coordinate }) {
+                blocks.remove(at: firstIndex)
+            }
+            
+            DispatchQueue.main.async {
+                self.level.world.blocks = blocks
+            }
+        }
     }
 }

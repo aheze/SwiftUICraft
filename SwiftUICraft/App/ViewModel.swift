@@ -9,25 +9,44 @@
 import SwiftUI
 
 class ViewModel: ObservableObject {
-    
+    // MARK: - Properties
+
     @Published var status = GameStatus.playing
     
+    /// Currently there's 3 levels.
     @Published var levels = [Level.level1, Level.level2, Level.level3]
+    
+    /// Change this to 0, 1, or 2.
     @Published var selectedLevelIndex = 2
+    
+    /// The current selected item in the hotbar.
     @Published var selectedItem = Item.dirt
+    
+    /// Corresponds to up/down/left/right controls.
     @Published var offset = CGSize.zero
     
-    @Published var currentTask: Task<Void, any Error>?
+    /// If liquid is animating in, the task will be stored here.
+    @Published var currentLiquidAnimationTask: Task<Void, any Error>?
+    
+    /// Corresponds to zoom controls.
     @Published var scale = CGFloat(1)
+    
+    // MARK: - Tilting
+    
+    /// Saves the drag gesture's translation.
     @Published var savedTranslation = CGFloat(0)
+    
+    /// This will have a value when the user is dragging.
     @Published var additionalTranslation = CGFloat(0)
     
+    /// The `tilt` passed to Prism for adjusting perspective.
     var tilt: CGFloat {
         let translation = savedTranslation + additionalTranslation
         let tilt = 0.3 - (translation / 100)
         return max(0.00001, tilt)
     }
     
+    /// The current level.
     var level: Level {
         get {
             levels[selectedLevelIndex]
@@ -36,13 +55,18 @@ class ViewModel: ObservableObject {
         }
     }
     
+    /// The length of each block.
     let blockLength = CGFloat(50)
 }
 
 extension ViewModel {
+    
+    /// Add the current selected item at a coordinate.
     func addBlock(at coordinate: Coordinate) {
-        currentTask?.cancel()
-        currentTask = nil
+        
+        /// Cancel existing animations if there's any.
+        currentLiquidAnimationTask?.cancel()
+        currentLiquidAnimationTask = nil
         
         switch selectedItem {
         case .bucket:
@@ -50,12 +74,12 @@ extension ViewModel {
         case .lavaBucket:
             addLiquid(at: coordinate, initialBlockKind: .lavaSource, blockKind: .lava)
         default:
-            /// only allow blocks (items that have a block preview) to be placed, not other items
+            /// Only allow blocks (items that have a block preview) to be placed, not other items.
             guard let associatedBlockKind = selectedItem.associatedBlockKind else { return }
             
             var blocks = level.world.blocks
             DispatchQueue.global().async {
-                /// prevent duplicates
+                /// Prevent duplicates.
                 if let firstIndex = blocks.firstIndex(where: { $0.coordinate == coordinate }) {
                     blocks.remove(at: firstIndex)
                 }
@@ -70,11 +94,12 @@ extension ViewModel {
         }
     }
     
+    /// Add water or lava at a coordinate and animate it to surrounding blocks.
     func addLiquid(at coordinate: Coordinate, initialBlockKind: BlockKind, blockKind: BlockKind) {
         var blocks = level.world.blocks
         DispatchQueue.global().async {
             blocks = self.modifyWorldForLiquid(existingBlocks: blocks, isInitial: true, initialBlockKind: initialBlockKind, blockKind: blockKind, at: coordinate, depth: 0)
-            blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
+            blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// Maintain the order.
             blocks = blocks.uniqued()
 
             DispatchQueue.main.async {
@@ -82,9 +107,9 @@ extension ViewModel {
             }
 
             /**
-             1. the block
-             2. the block's index in `blocks`
-             3. the block's planar distance from the source block
+             1. The block
+             2. The block's index in `blocks`
+             3. The block's planar distance from the source block
              */
             let blocksWithIndicesAndDistance: [(Block, Int, Int)] = blocks.indices.compactMap { index in
                 let block = blocks[index]
@@ -105,7 +130,7 @@ extension ViewModel {
             
             let groupedBlocksCollection = blocksWithIndicesAndDistance
                 .sorted {
-                    $0.2 < $1.2 /// sort by distance
+                    $0.2 < $1.2 /// Sort by distance.
                 }.group { $0.2 }
             
             let task = Task {
@@ -127,16 +152,17 @@ extension ViewModel {
                         }
                     }()
                     
-                    try await Task.sleep(seconds: 0.02)
+                    try await Task.sleep(seconds: 0.02) /// Add a slight delay to make a ripple effect.
                 }
             }
             
             DispatchQueue.main.async {
-                self.currentTask = task
+                self.currentLiquidAnimationTask = task
             }
         }
     }
     
+    /// A recursive algorithm that places water or lava.
     func modifyWorldForLiquid(
         existingBlocks: [Block],
         maximumSpread: Int = 3,
@@ -175,13 +201,15 @@ extension ViewModel {
         let coordinateUnderneath = Coordinate(row: coordinate.row, column: coordinate.column, levitation: coordinate.levitation - 1)
         
         if
-            depth == 0, /// only spread if the depth is 0 and the block underneath is land
+            depth == 0, /// Only spread if the depth is 0 and the block underneath is land.
             existingBlocks.contains(where: { $0.coordinate == coordinateUnderneath && !$0.blockKind.isLiquid })
         {
-            /// check if current block is on a surface
+            /// Check if current block is on a surface.
             if existingBlocks.contains(where: {
                 $0.coordinate == coordinateUnderneath
             }) {
+                
+                /// Check surrounding blocks.
                 let surroundingOffsets: [(x: Int, y: Int)] = [
                     (-1, -1), (0, -1), (1, -1),
                     (-1, 0), (1, 0),
@@ -201,11 +229,12 @@ extension ViewModel {
                 }
                 
                 for index in 0...liquidSpread {
-                    /// draw a diamond-shaped ring of blocks
+                    /// Draw a diamond-shaped ring of blocks.
                     for column in -index...index {
                         let rowOffset = index - abs(column)
                         let liquidCoordinate = Coordinate(row: coordinate.row + rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
                   
+                        /// Add a liquid block.
                         existingBlocks = modifyWorldForLiquid(
                             existingBlocks: existingBlocks,
                             isInitial: false,
@@ -215,7 +244,9 @@ extension ViewModel {
                             depth: depth + index + 1
                         )
                             
-                        if column != -index {
+                        /// Add a liquid block mirrored across the x-axis.
+                        /// No need to add in the case of the first and last.
+                        if abs(column) != index {
                             let liquidCoordinate = Coordinate(row: coordinate.row - rowOffset, column: coordinate.column + column, levitation: coordinate.levitation)
                             existingBlocks = modifyWorldForLiquid(
                                 existingBlocks: existingBlocks,

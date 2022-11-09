@@ -292,6 +292,95 @@ extension Level {
                 }
             }
             
+            for row in 0..<height {
+                for column in 0..<10 {
+                    let shouldAdd = (column - (height - row)) < -5
+                    
+                    if shouldAdd {
+                        let coordinate = Coordinate(row: row, column: column, levitation: 2)
+                        let block = Block(coordinate: coordinate, blockKind: .nylium)
+                        blocks.append(block)
+                    }
+                }
+            }
+            
+            /// right side
+            for row in 0..<height {
+                for column in 0..<width {
+                    let shouldAdd = (column - (height - row)) < -3
+                    
+                    if shouldAdd {
+                        let coordinate = Coordinate(row: height - row - 1, column: width - column - 1, levitation: 1)
+                        let block = Block(coordinate: coordinate, blockKind: .nylium)
+                        blocks.append(block)
+                    }
+                }
+            }
+            
+            for row in 0..<height {
+                for column in 0..<width {
+                    let shouldAdd = (column - (height - row)) < -5
+                    
+                    if shouldAdd {
+                        let coordinate = Coordinate(row: height - row - 1, column: width - column - 1, levitation: 2)
+                        let block = Block(coordinate: coordinate, blockKind: .blackstone)
+                        blocks.append(block)
+                    }
+                }
+            }
+            
+            for (x, y) in [
+                (11, 1), (11, 2), (10, 2), (10, 3), (9, 4)
+            ] {
+                let coordinate = Coordinate(row: y, column: x, levitation: 1)
+                let block = Block(coordinate: coordinate, blockKind: .nylium)
+                blocks.append(block)
+            }
+            
+            for x in [
+                7, 9, 11
+            ] {
+                for y in 1 ... 4 {
+                    let coordinate = Coordinate(row: 0, column: x, levitation: y)
+                    let block = Block(coordinate: coordinate, blockKind: .netherBricks)
+                    blocks.append(block)
+                }
+                
+                let coordinate = Coordinate(row: 0, column: x, levitation: 5)
+                let block = Block(coordinate: coordinate, blockKind: .glowstone)
+                blocks.append(block)
+            }
+            
+            for (x, y) in [
+                (6, 0), (8, 0), (10, 0),
+                (7, 1), (8, 1), (9, 1), (10, 1),
+                (9, 2), (9, 3)
+            ] {
+                let coordinate = Coordinate(row: y, column: x, levitation: 1)
+                let block = Block(coordinate: coordinate, blockKind: .guildedBlackstone)
+                blocks.append(block)
+            }
+            
+            for y in 1 ... 5 {
+                let coordinate = Coordinate(row: 3, column: 6, levitation: y)
+                let block = Block(coordinate: coordinate, blockKind: .warpedStem)
+                blocks.append(block)
+            }
+            
+            for y in 1 ... 3 {
+                let coordinate = Coordinate(row: 5, column: 3, levitation: y)
+                let block = Block(coordinate: coordinate, blockKind: .crimsonStem)
+                blocks.append(block)
+            }
+            
+            for (x, y) in [
+                (8, 0), (10, 0)
+            ] {
+                let coordinate = Coordinate(row: y, column: x, levitation: 2)
+                let block = Block(coordinate: coordinate, blockKind: .gold)
+                blocks.append(block)
+            }
+            
             blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order
             let world = World(width: width, height: height, blocks: blocks)
             return world
@@ -310,7 +399,7 @@ extension Level {
                 .laser,
             ],
             world: world,
-            background: [0x9B5D58, 0x6B1500, 0x000000, 0x000000]
+            background: [0x6B1500, 0x8E0003, 0x500002, 0x000000]
         )
         
         return level

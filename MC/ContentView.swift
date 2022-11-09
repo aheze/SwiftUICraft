@@ -377,8 +377,12 @@ struct BlockView: View {
             case .laser:
                 Color.yellow.opacity(0.5)
             case .lava:
+                let delay = abs(block.extrusionPercentage - 1) / CGFloat(0.6)
+                
                 LinearGradient(colors: [.red, .orange], startPoint: .topLeading, endPoint: .bottomTrailing)
                     .opacity(0.8)
+                    .hueRotation(.degrees(animated ? -20 : 20))
+                    .animation(.linear(duration: 1.4).repeatForever().delay(delay), value: animated)
             case .lavaSource:
                 Color.red
             }

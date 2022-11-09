@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+/// The game's status, which controls which controls are shown.
 enum GameStatus {
     case playing
     case paused

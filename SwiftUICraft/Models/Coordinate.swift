@@ -8,13 +8,15 @@
 
 import SwiftUI
 
+/// A 3D point in space.
 struct Coordinate: Hashable, Comparable {
     var row: Int
     var column: Int
     var levitation: Int
 
+    /// Allow ordering by coordinate to maintain Prism's 3D effect.
     static func < (lhs: Coordinate, rhs: Coordinate) -> Bool {
-        /// from https://sarunw.com/posts/how-to-sort-by-multiple-properties-in-swift/
+        /// From https://sarunw.com/posts/how-to-sort-by-multiple-properties-in-swift/
         let predicates: [(Coordinate, Coordinate) -> Bool] = [ // <2>
             { $0.row < $1.row },
             { $0.column < $1.column },

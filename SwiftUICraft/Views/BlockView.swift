@@ -9,6 +9,11 @@
 import Prism
 import SwiftUI
 
+/**
+ A single block for drawing in `GameView`.
+ 
+ Powered by Prism.
+ */
 struct BlockView: View {
     var tilt: CGFloat
     var length: CGFloat

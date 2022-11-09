@@ -8,6 +8,9 @@
     
 import SwiftUI
 
+/**
+ Contains all the game logic.
+ */
 class ViewModel: ObservableObject {
     // MARK: - Properties
 
@@ -39,7 +42,7 @@ class ViewModel: ObservableObject {
     /// This will have a value when the user is dragging.
     @Published var additionalTranslation = CGFloat(0)
     
-    /// The `tilt` passed to Prism for adjusting perspective.
+    /// The `tilt` passed to Prism for adjusting POV.
     var tilt: CGFloat {
         let translation = savedTranslation + additionalTranslation
         let tilt = 0.3 - (translation / 100)
@@ -60,10 +63,8 @@ class ViewModel: ObservableObject {
 }
 
 extension ViewModel {
-    
     /// Add the current selected item at a coordinate.
     func addBlock(at coordinate: Coordinate) {
-        
         /// Cancel existing animations if there's any.
         currentLiquidAnimationTask?.cancel()
         currentLiquidAnimationTask = nil
@@ -208,7 +209,6 @@ extension ViewModel {
             if existingBlocks.contains(where: {
                 $0.coordinate == coordinateUnderneath
             }) {
-                
                 /// Check surrounding blocks.
                 let surroundingOffsets: [(x: Int, y: Int)] = [
                     (-1, -1), (0, -1), (1, -1),

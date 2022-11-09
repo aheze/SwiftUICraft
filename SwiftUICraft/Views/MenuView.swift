@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+/// The game menu that displays when `model.status == .paused`.
 struct MenuView: View {
     @ObservedObject var model: ViewModel
 

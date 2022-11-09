@@ -9,6 +9,7 @@
 import Prism
 import SwiftUI
 
+/// The main view.
 struct ContentView: View {
     @StateObject var model = ViewModel()
 

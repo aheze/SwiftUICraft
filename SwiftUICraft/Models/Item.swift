@@ -8,6 +8,7 @@
     
 import SwiftUI
 
+/// A hotbar item.
 enum Item: String, CaseIterable {
     case dirt
     case grass

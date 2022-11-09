@@ -8,8 +8,7 @@
     
 import SwiftUI
 
-/// represents a chunk in the world
-/// use `Hashable` for preventing duplicate coordinates
+/// A block chunk in the world.
 struct Block: Hashable {
     var coordinate: Coordinate
     var blockKind: BlockKind
@@ -22,6 +21,7 @@ struct Block: Hashable {
     }
 }
 
+/// Enumerates all possible block types.
 enum BlockKind: String, CaseIterable {
     case dirt
     case grass

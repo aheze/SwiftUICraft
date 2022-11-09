@@ -5,10 +5,10 @@
 //  Created by A. Zheng (github.com/aheze) on 11/9/22.
 //  Copyright © 2022 A. Zheng. All rights reserved.
 //
-    
 
 import Foundation
 
+/// Represents possible buttons in the D-Pad.
 enum Control {
     case direction(Direction)
     case center

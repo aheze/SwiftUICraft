@@ -9,6 +9,7 @@
 import Prism
 import SwiftUI
 
+/// Displays a hotbar item.
 struct ItemView: View {
     var item: Item
 

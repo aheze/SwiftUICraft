@@ -8,6 +8,7 @@
     
 import SwiftUI
 
+/// The D-Pad and hotbar.
 struct ControlsView: View {
     @ObservedObject var model: ViewModel
     

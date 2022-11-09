@@ -9,6 +9,11 @@
 import Prism
 import SwiftUI
 
+/**
+ The 3D game content.
+
+ It's all SwiftUI — no SceneKit, SpriteKit, or anything else!
+ */
 struct GameView: View {
     @ObservedObject var model: ViewModel
 
@@ -17,15 +22,15 @@ struct GameView: View {
             .overlay {
                 game
                     .scaleEffect(model.scale)
-                    .offset(y: 120)
+                    .offset(y: 120) /// Start off slightly downwards so that everything is visible.
             }
-            .offset(model.offset)
+            .offset(model.offset) /// Up/down/left/right,
             .drawingGroup()
             .background {
                 LinearGradient(colors: model.level.background.map { Color(uiColor: .init(hex: $0)) }, startPoint: .top, endPoint: .bottom)
             }
             .ignoresSafeArea()
-            .simultaneousGesture(
+            .simultaneousGesture( /// For changing the tilt / POV.
                 DragGesture(minimumDistance: 0)
                     .onChanged { value in
                         model.additionalTranslation = value.translation.width
@@ -44,8 +49,11 @@ struct GameView: View {
                 height: CGFloat(model.level.world.height) * model.blockLength
             )
 
+            /// Add a white base.
             PrismColorView(tilt: model.tilt, size: size, extrusion: 20, levitation: -20, color: Color.white)
                 .overlay {
+                    /// Enumerate over all blocks in the world and display them.
+                    /// `model.level.world.blocks` must be sorted ascending for the 3D illusion to work.
                     ZStack(alignment: .topLeading) {
                         ForEach(model.level.world.blocks, id: \.hashValue) { block in
                             BlockView(
@@ -75,7 +83,7 @@ struct GameView: View {
                                 )
                                 model.addBlock(at: coordinate)
                             }
-                            .offset(
+                            .offset( /// Position the block.
                                 x: CGFloat(block.coordinate.column) * model.blockLength,
                                 y: CGFloat(block.coordinate.row) * model.blockLength
                             )
@@ -84,6 +92,6 @@ struct GameView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 }
         }
-        .scaleEffect(y: 0.69)
+        .scaleEffect(y: 0.69) /// Make everything a bit squished for a perspective illusion.
     }
 }

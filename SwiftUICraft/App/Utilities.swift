@@ -8,7 +8,11 @@
 
 import SwiftUI
 
-/// from https://stackoverflow.com/a/46354989/14351818
+/**
+ Some utilities for making things easier.
+ */
+
+/// From https://stackoverflow.com/a/46354989/14351818
 public extension Array where Element: Hashable {
     func uniqued() -> [Element] {
         var seen = Set<Element>()
@@ -20,7 +24,7 @@ func DistanceSquared(from: (x: Int, y: Int), to: (x: Int, y: Int)) -> Int {
     return (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y)
 }
 
-/// from https://stackoverflow.com/a/43520047/14351818
+/// From https://stackoverflow.com/a/43520047/14351818
 extension Sequence {
     func group<GroupingType: Hashable>(by key: (Iterator.Element) -> GroupingType) -> [[Iterator.Element]] {
         var groups: [GroupingType: [Iterator.Element]] = [:]
@@ -47,7 +51,7 @@ extension UIColor {
     convenience init(hex: Int, alpha: CGFloat = 1) {
         self.init(hex: UInt(hex), alpha: alpha)
     }
-    
+
     convenience init(hex: UInt, alpha: CGFloat = 1) {
         self.init(
             red: CGFloat((hex & 0xFF0000) >> 16) / 255.0,

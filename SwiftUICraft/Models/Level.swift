@@ -8,13 +8,17 @@
     
 import SwiftUI
 
+/**
+ A saved world along with hotbar items and a gradient background.
+ */
 struct Level {
-    var items: [Item]
     var world: World
+    var items: [Item]
     var background: [Int]
 }
 
 extension Level {
+    /// The default overworld.
     static let level1: Level = {
         let world: World = {
             let width = 15
@@ -121,6 +125,7 @@ extension Level {
         }()
         
         let level = Level(
+            world: world,
             items: [
                 .dirt,
                 .grass,
@@ -132,7 +137,6 @@ extension Level {
                 .bucket,
                 .beef,
             ],
-            world: world,
             background: [0x56B1DB, 0xFFFFFF, 0xFFFFFF, 0x96C9FD]
         )
         
@@ -141,6 +145,7 @@ extension Level {
 }
 
 extension Level {
+    /// Sand / ice world.
     static let level2: Level = {
         let world: World = {
             let width = 10
@@ -245,6 +250,7 @@ extension Level {
         }()
         
         let level = Level(
+            world: world,
             items: [
                 .bucket,
                 .ice,
@@ -256,7 +262,6 @@ extension Level {
                 .acaciaPlanks,
                 .amethyst,
             ],
-            world: world,
             background: [0x4CCCDA, 0xFFFFFF, 0xFFFFFF, 0x8BDAC4]
         )
         
@@ -265,6 +270,7 @@ extension Level {
 }
 
 extension Level {
+    /// The nether!
     static let level3: Level = {
         let world: World = {
             let width = 12
@@ -387,6 +393,7 @@ extension Level {
         }()
         
         let level = Level(
+            world: world,
             items: [
                 .warpedStem,
                 .nylium,
@@ -398,7 +405,6 @@ extension Level {
                 .lavaBucket,
                 .laser,
             ],
-            world: world,
             background: [0x6B1500, 0x8E0003, 0x500002, 0x000000]
         )
         

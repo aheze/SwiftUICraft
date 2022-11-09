@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+/// An texture for drawing different `Block`s.
 enum Texture {
     case differentSides(top: String, sides: String)
     case image(String)

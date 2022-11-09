@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+/// A singular D-Pad button.
 struct ControlView: View {
     var control: Control
     var action: () -> Void

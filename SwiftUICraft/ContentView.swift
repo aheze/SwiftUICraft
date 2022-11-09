@@ -92,7 +92,7 @@ struct ContentView: View {
             }
             
             if active {
-                KeyboardButton(key: .reset) {
+                ControlView(control: .reset) {
                     let level: Level
                     switch index {
                     case 0:
@@ -167,15 +167,15 @@ struct ContentView: View {
             HStack {
                 Grid {
                     GridRow {
-                        KeyboardButton(key: .pause) {
+                        ControlView(control: .pause) {
                             model.gameActive = false
                         }
-                        KeyboardButton(key: .zoomOut) {
+                        ControlView(control: .zoomOut) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                                 model.scale -= 0.1
                             }
                         }
-                        KeyboardButton(key: .zoomIn) {
+                        ControlView(control: .zoomIn) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                                 model.scale += 0.1
                             }
@@ -187,7 +187,7 @@ struct ContentView: View {
                     
                     GridRow {
                         block
-                        KeyboardButton(key: .direction(.up)) {
+                        ControlView(control: .direction(.up)) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                                 model.offset.height += 100
                             }
@@ -195,17 +195,17 @@ struct ContentView: View {
                         block
                     }
                     GridRow {
-                        KeyboardButton(key: .direction(.left)) {
+                        ControlView(control: .direction(.left)) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                                 model.offset.width += 100
                             }
                         }
-                        KeyboardButton(key: .center) {
+                        ControlView(control: .center) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                                 model.offset = .zero
                             }
                         }
-                        KeyboardButton(key: .direction(.right)) {
+                        ControlView(control: .direction(.right)) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                                 model.offset.width -= 100
                             }
@@ -213,7 +213,7 @@ struct ContentView: View {
                     }
                     GridRow {
                         block
-                        KeyboardButton(key: .direction(.down)) {
+                        ControlView(control: .direction(.down)) {
                             withAnimation(.spring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
                                 model.offset.height -= 100
                             }
@@ -284,8 +284,8 @@ struct ContentView: View {
     }
 }
 
-struct KeyboardButton: View {
-    var key: KeyboardKey
+struct ControlView: View {
+    var control: Control
     var action: () -> Void
     
     var body: some View {
@@ -295,13 +295,13 @@ struct KeyboardButton: View {
                 .resizable()
                 .frame(width: 70, height: 70)
                 .overlay {
-                    if case let .direction(direction) = key {
-                        Image(key.image)
+                    if case let .direction(direction) = control {
+                        Image(control.image)
                             .interpolation(.none)
                             .resizable()
                             .rotationEffect(.degrees(direction.rotation))
                     } else {
-                        Image(key.image)
+                        Image(control.image)
                             .interpolation(.none)
                             .resizable()
                     }

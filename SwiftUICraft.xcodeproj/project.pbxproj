@@ -15,6 +15,12 @@
 		3CBC12832918B0A300D9DB0E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CBC12822918B0A300D9DB0E /* ContentView.swift */; };
 		3CBC12852918B0A400D9DB0E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3CBC12842918B0A400D9DB0E /* Assets.xcassets */; };
 		3CBC12902918B0D900D9DB0E /* Prism in Frameworks */ = {isa = PBXBuildFile; productRef = 3CBC128F2918B0D900D9DB0E /* Prism */; };
+		3CC25B72291C26420008449D /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B71291C26420008449D /* Item.swift */; };
+		3CC25B74291C26540008449D /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B73291C26540008449D /* Block.swift */; };
+		3CC25B76291C265E0008449D /* Texture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B75291C265E0008449D /* Texture.swift */; };
+		3CC25B78291C266F0008449D /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B77291C266F0008449D /* World.swift */; };
+		3CC25B7A291C267B0008449D /* Coordinate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B79291C267B0008449D /* Coordinate.swift */; };
+		3CC25B7C291C26910008449D /* Control.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC25B7B291C26910008449D /* Control.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +32,12 @@
 		3CBC12802918B0A300D9DB0E /* SwiftUICraftApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUICraftApp.swift; sourceTree = "<group>"; };
 		3CBC12822918B0A300D9DB0E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3CBC12842918B0A400D9DB0E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3CC25B71291C26420008449D /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		3CC25B73291C26540008449D /* Block.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Block.swift; sourceTree = "<group>"; };
+		3CC25B75291C265E0008449D /* Texture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Texture.swift; sourceTree = "<group>"; };
+		3CC25B77291C266F0008449D /* World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = World.swift; sourceTree = "<group>"; };
+		3CC25B79291C267B0008449D /* Coordinate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinate.swift; sourceTree = "<group>"; };
+		3CC25B7B291C26910008449D /* Control.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Control.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +73,7 @@
 			children = (
 				3CBC12802918B0A300D9DB0E /* SwiftUICraftApp.swift */,
 				3CB363452919DC0600737CF5 /* Models.swift */,
+				3CC25B70291C263B0008449D /* Models */,
 				3CBC12822918B0A300D9DB0E /* ContentView.swift */,
 				3CB363432919DBF900737CF5 /* MinecraftViewModel.swift */,
 				3CB363492919DD9000737CF5 /* Level.swift */,
@@ -68,6 +81,19 @@
 				3CBC12842918B0A400D9DB0E /* Assets.xcassets */,
 			);
 			path = SwiftUICraft;
+			sourceTree = "<group>";
+		};
+		3CC25B70291C263B0008449D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				3CC25B71291C26420008449D /* Item.swift */,
+				3CC25B73291C26540008449D /* Block.swift */,
+				3CC25B75291C265E0008449D /* Texture.swift */,
+				3CC25B77291C266F0008449D /* World.swift */,
+				3CC25B79291C267B0008449D /* Coordinate.swift */,
+				3CC25B7B291C26910008449D /* Control.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -146,10 +172,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				3CB3634A2919DD9000737CF5 /* Level.swift in Sources */,
+				3CC25B74291C26540008449D /* Block.swift in Sources */,
 				3CBC12832918B0A300D9DB0E /* ContentView.swift in Sources */,
 				3CBC12812918B0A300D9DB0E /* SwiftUICraftApp.swift in Sources */,
+				3CC25B78291C266F0008449D /* World.swift in Sources */,
+				3CC25B7C291C26910008449D /* Control.swift in Sources */,
+				3CC25B7A291C267B0008449D /* Coordinate.swift in Sources */,
 				3CB363442919DBF900737CF5 /* MinecraftViewModel.swift in Sources */,
+				3CC25B72291C26420008449D /* Item.swift in Sources */,
 				3CB363482919DC3800737CF5 /* Utilities.swift in Sources */,
+				3CC25B76291C265E0008449D /* Texture.swift in Sources */,
 				3CB363462919DC0600737CF5 /* Models.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

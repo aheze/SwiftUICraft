@@ -27,5 +27,6 @@ struct ContentView: View {
                 MenuView(model: model)
             }
         }
+        .persistentSystemOverlays(model.homeIndicatorShown ? .automatic : .hidden)
     }
 }

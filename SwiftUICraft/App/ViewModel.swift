@@ -34,6 +34,9 @@ class ViewModel: ObservableObject {
     /// Corresponds to zoom controls.
     @Published var scale = CGFloat(1)
     
+    /// Whether the home indicator and other overlays are shown or not.
+    @Published var homeIndicatorShown = false
+    
     // MARK: - Tilting
     
     /// Saves the drag gesture's translation.

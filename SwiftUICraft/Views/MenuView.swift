@@ -40,6 +40,11 @@ struct MenuView: View {
                             }
                         }
                     }
+
+                    /// This may take a couple seconds
+                    MenuButton(text: model.homeIndicatorShown ? "Suppress System UI" : "Show System UI") {
+                        model.homeIndicatorShown.toggle()
+                    }
                 }
 
                 VStack(alignment: .leading, spacing: 20) {

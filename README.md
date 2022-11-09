@@ -4,10 +4,11 @@ Minecraft but made with SwiftUI.
 
 - 100% SwiftUI. No SceneKit, SpriteKit, or anything else.
 - Powered by [Prism](https://github.com/aheze/Prism), a lightweight 3D renderer for SwiftUI.
-- Supports placing and destroying 20+ blocks.
-- Includes liquid physics with water and lava.
-- 3 levels to choose from.
-- Works in both Landscape and Portrait mode.
+- Place and destroy 20+ blocks.
+- Supports liquid physics with water and lava.
+- Works in both landscape and portrait mode.
+- Includes 3 levels to choose from.
+- Auto-saves your progress.
 - LASERS!
 
 ![Level 1](Assets/Level1.PNG)

@@ -57,6 +57,7 @@ struct GameView: View {
                     ZStack(alignment: .topLeading) {
                         ForEach(model.level.world.blocks, id: \.hashValue) { block in
                             BlockView(
+                                selectedItem: model.selectedItem,
                                 tilt: model.tilt,
                                 length: model.blockLength,
                                 levitation: CGFloat(block.coordinate.levitation) * model.blockLength,
@@ -82,11 +83,7 @@ struct GameView: View {
                                     levitation: block.coordinate.levitation
                                 )
                                 model.addBlock(at: coordinate)
-                            } topHeld: {
-                                model.removeBlock(at: block.coordinate)
-                            } leftHeld: {
-                                model.removeBlock(at: block.coordinate)
-                            } rightHeld: {
+                            } held: {
                                 model.removeBlock(at: block.coordinate)
                             }
                             .offset( /// Position the block.

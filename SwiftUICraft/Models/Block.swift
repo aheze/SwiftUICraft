@@ -24,7 +24,7 @@ struct Block: Hashable {
     var active = true
     
     /// How long you should hold a block to break it.
-    let holdDurationForRemoval = CGFloat(0.3)
+    let holdDurationForRemoval = CGFloat(0.1)
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(coordinate)

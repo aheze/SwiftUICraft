@@ -15,6 +15,7 @@ import SwiftUI
  Powered by Prism.
  */
 struct BlockView: View {
+    var selectedItem: Item?
     var tilt: CGFloat
     var length: CGFloat
     var levitation: CGFloat
@@ -23,9 +24,7 @@ struct BlockView: View {
     var topTapped: (() -> Void)?
     var leftTapped: (() -> Void)?
     var rightTapped: (() -> Void)?
-    var topHeld: (() -> Void)?
-    var leftHeld: (() -> Void)?
-    var rightHeld: (() -> Void)?
+    var held: (() -> Void)? /// For long press / block breaking.
     
     @State var animated = false
 
@@ -203,38 +202,50 @@ struct BlockView: View {
             levitation: adjustedLevitation,
             shadowOpacity: 0.25
         ) {
-            if let topTapped, let topHeld {
+            if let topTapped, let held {
                 top
                     .onTapGesture {
-                        topTapped()
+                        if selectedItem?.associatedBlockKind == nil {
+                            held()
+                        } else {
+                            topTapped()
+                        }
                     }
                     .onLongPressGesture(minimumDuration: block.holdDurationForRemoval) {
-                        topHeld()
+                        held()
                     }
             } else {
                 top
             }
             
         } left: {
-            if let leftTapped, let leftHeld {
+            if let leftTapped, let held {
                 left
                     .onTapGesture {
-                        leftTapped()
+                        if selectedItem?.associatedBlockKind == nil {
+                            held()
+                        } else {
+                            leftTapped()
+                        }
                     }
                     .onLongPressGesture(minimumDuration: block.holdDurationForRemoval) {
-                        leftHeld()
+                        held()
                     }
             } else {
                 left
             }
         } right: {
-            if let rightTapped, let rightHeld {
+            if let rightTapped, let held {
                 right
                     .onTapGesture {
-                        rightTapped()
+                        if selectedItem?.associatedBlockKind == nil {
+                            held()
+                        } else {
+                            rightTapped()
+                        }
                     }
                     .onLongPressGesture(minimumDuration: block.holdDurationForRemoval) {
-                        rightHeld()
+                        held()
                     }
             } else {
                 right

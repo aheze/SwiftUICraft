@@ -310,7 +310,7 @@ extension Level {
                 .laser,
             ],
             world: world,
-            background: [0xFF2E00, 0x6B1500, 0x000000, 0x000000]
+            background: [0x9B5D58, 0x6B1500, 0x000000, 0x000000]
         )
         
         return level

@@ -54,6 +54,10 @@ extension MinecraftViewModel {
             
             var blocks = level.world.blocks
             DispatchQueue.global().async {
+                /// prevent duplicates
+                if let firstIndex = blocks.firstIndex(where: { $0.coordinate == coordinate }) {
+                    blocks.remove(at: firstIndex)
+                }
                 let block = Block(coordinate: coordinate, blockKind: associatedBlockKind)
                 blocks.append(block)
                 blocks = blocks.sorted { a, b in a.coordinate < b.coordinate } /// maintain order

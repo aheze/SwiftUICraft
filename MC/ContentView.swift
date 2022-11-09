@@ -45,7 +45,7 @@ struct ContentView: View {
             if !model.gameActive {
                 Color.clear.overlay {
                     HStack(alignment: .top, spacing: 24) {
-                        VStack(spacing: 10) {
+                        VStack(spacing: 20) {
                             MenuButton(text: "Resume") {
                                 model.gameActive = true
                             }
@@ -121,7 +121,7 @@ struct ContentView: View {
             PrismColorView(tilt: model.tilt, size: size, extrusion: 20, levitation: -20, color: Color.white)
                 .overlay {
                     ZStack(alignment: .topLeading) {
-                        ForEach(model.level.world.blocks) { block in
+                        ForEach(model.level.world.blocks, id: \.hashValue) { block in
                             BlockView(
                                 tilt: model.tilt,
                                 length: model.blockLength,
@@ -358,7 +358,7 @@ struct BlockView: View {
     var rightPressed: (() -> Void)?
     
     @State var animated = false
-    
+
     var top: some View {
         Group {
             switch block.blockKind.texture {
@@ -377,7 +377,8 @@ struct BlockView: View {
             case .laser:
                 Color.yellow.opacity(0.5)
             case .lava:
-                Color.orange
+                LinearGradient(colors: [.red, .orange], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .opacity(0.8)
             case .lavaSource:
                 Color.red
             }
@@ -408,17 +409,20 @@ struct BlockView: View {
                             .strokeBorder(
                                 Color.white,
                                 style: .init(
-                                    lineWidth: 1.5,
+                                    lineWidth: 1,
                                     lineCap: .square,
                                     dash: [40, 20],
                                     dashPhase: animated ? -240 : 0
                                 )
                             )
+                            .animation(.linear(duration: 0.9).repeatForever(autoreverses: false), value: animated)
                     }
             case .lava:
                 Color.orange
+                    .opacity(0.7)
             case .lavaSource:
                 Color.red
+                    .brightness(-0.1)
             }
         }
     }
@@ -447,17 +451,20 @@ struct BlockView: View {
                             .strokeBorder(
                                 Color.white,
                                 style: .init(
-                                    lineWidth: 1.5,
+                                    lineWidth: 1,
                                     lineCap: .square,
                                     dash: [40, 20],
                                     dashPhase: animated ? 240 : 0
                                 )
                             )
+                            .animation(.linear(duration: 0.9).repeatForever(autoreverses: false), value: animated)
                     }
             case .lava:
                 Color.orange
+                    .opacity(0.6)
             case .lavaSource:
                 Color.red
+                    .brightness(-0.2)
             }
         }
     }
@@ -542,9 +549,7 @@ struct BlockView: View {
         .allowsHitTesting(!block.blockKind.isLiquid)
         .opacity(block.active ? 1 : 0)
         .onAppear {
-            withAnimation(.linear(duration: 0.9).repeatForever(autoreverses: false)) {
-                animated = true
-            }
+            animated = true
         }
     }
 }

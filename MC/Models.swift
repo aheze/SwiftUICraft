@@ -147,11 +147,7 @@ enum Item: String, CaseIterable {
 
 /// represents a chunk in the world
 /// use `Hashable` for preventing duplicate coordinates
-struct Block: Identifiable, Hashable {
-    var id: Coordinate {
-        coordinate
-    }
-
+struct Block: Hashable {
     var coordinate: Coordinate
     var blockKind: BlockKind
     var extrusionPercentage = CGFloat(1)
@@ -159,6 +155,7 @@ struct Block: Identifiable, Hashable {
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(coordinate)
+        hasher.combine(blockKind)
     }
 }
 
@@ -245,7 +242,7 @@ enum BlockKind: String, CaseIterable {
         case .gold:
             return .image("gold_block")
         case .lava:
-            return .lavaSource
+            return .lava
         case .lavaSource:
             return .lavaSource
         case .laser:

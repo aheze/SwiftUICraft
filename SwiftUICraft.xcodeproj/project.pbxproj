@@ -11,10 +11,9 @@
 		3CB363462919DC0600737CF5 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB363452919DC0600737CF5 /* Models.swift */; };
 		3CB363482919DC3800737CF5 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB363472919DC3800737CF5 /* Utilities.swift */; };
 		3CB3634A2919DD9000737CF5 /* Level.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB363492919DD9000737CF5 /* Level.swift */; };
-		3CBC12812918B0A300D9DB0E /* MCApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CBC12802918B0A300D9DB0E /* MCApp.swift */; };
+		3CBC12812918B0A300D9DB0E /* SwiftUICraftApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CBC12802918B0A300D9DB0E /* SwiftUICraftApp.swift */; };
 		3CBC12832918B0A300D9DB0E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CBC12822918B0A300D9DB0E /* ContentView.swift */; };
 		3CBC12852918B0A400D9DB0E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3CBC12842918B0A400D9DB0E /* Assets.xcassets */; };
-		3CBC12882918B0A400D9DB0E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3CBC12872918B0A400D9DB0E /* Preview Assets.xcassets */; };
 		3CBC12902918B0D900D9DB0E /* Prism in Frameworks */ = {isa = PBXBuildFile; productRef = 3CBC128F2918B0D900D9DB0E /* Prism */; };
 /* End PBXBuildFile section */
 
@@ -23,11 +22,10 @@
 		3CB363452919DC0600737CF5 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		3CB363472919DC3800737CF5 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		3CB363492919DD9000737CF5 /* Level.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Level.swift; sourceTree = "<group>"; };
-		3CBC127D2918B0A300D9DB0E /* MC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MC.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		3CBC12802918B0A300D9DB0E /* MCApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCApp.swift; sourceTree = "<group>"; };
+		3CBC127D2918B0A300D9DB0E /* SwiftUICraft.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUICraft.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3CBC12802918B0A300D9DB0E /* SwiftUICraftApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUICraftApp.swift; sourceTree = "<group>"; };
 		3CBC12822918B0A300D9DB0E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3CBC12842918B0A400D9DB0E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		3CBC12872918B0A400D9DB0E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,7 +43,7 @@
 		3CBC12742918B0A300D9DB0E = {
 			isa = PBXGroup;
 			children = (
-				3CBC127F2918B0A300D9DB0E /* MC */,
+				3CBC127F2918B0A300D9DB0E /* SwiftUICraft */,
 				3CBC127E2918B0A300D9DB0E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -53,40 +51,31 @@
 		3CBC127E2918B0A300D9DB0E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3CBC127D2918B0A300D9DB0E /* MC.app */,
+				3CBC127D2918B0A300D9DB0E /* SwiftUICraft.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		3CBC127F2918B0A300D9DB0E /* MC */ = {
+		3CBC127F2918B0A300D9DB0E /* SwiftUICraft */ = {
 			isa = PBXGroup;
 			children = (
-				3CBC12802918B0A300D9DB0E /* MCApp.swift */,
+				3CBC12802918B0A300D9DB0E /* SwiftUICraftApp.swift */,
 				3CB363452919DC0600737CF5 /* Models.swift */,
 				3CBC12822918B0A300D9DB0E /* ContentView.swift */,
 				3CB363432919DBF900737CF5 /* MinecraftViewModel.swift */,
 				3CB363492919DD9000737CF5 /* Level.swift */,
 				3CB363472919DC3800737CF5 /* Utilities.swift */,
 				3CBC12842918B0A400D9DB0E /* Assets.xcassets */,
-				3CBC12862918B0A400D9DB0E /* Preview Content */,
 			);
-			path = MC;
-			sourceTree = "<group>";
-		};
-		3CBC12862918B0A400D9DB0E /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				3CBC12872918B0A400D9DB0E /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
+			path = SwiftUICraft;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3CBC127C2918B0A300D9DB0E /* MC */ = {
+		3CBC127C2918B0A300D9DB0E /* SwiftUICraft */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3CBC128B2918B0A400D9DB0E /* Build configuration list for PBXNativeTarget "MC" */;
+			buildConfigurationList = 3CBC128B2918B0A400D9DB0E /* Build configuration list for PBXNativeTarget "SwiftUICraft" */;
 			buildPhases = (
 				3CBC12792918B0A300D9DB0E /* Sources */,
 				3CBC127A2918B0A300D9DB0E /* Frameworks */,
@@ -96,12 +85,12 @@
 			);
 			dependencies = (
 			);
-			name = MC;
+			name = SwiftUICraft;
 			packageProductDependencies = (
 				3CBC128F2918B0D900D9DB0E /* Prism */,
 			);
 			productName = MC;
-			productReference = 3CBC127D2918B0A300D9DB0E /* MC.app */;
+			productReference = 3CBC127D2918B0A300D9DB0E /* SwiftUICraft.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -119,7 +108,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 3CBC12782918B0A300D9DB0E /* Build configuration list for PBXProject "MC" */;
+			buildConfigurationList = 3CBC12782918B0A300D9DB0E /* Build configuration list for PBXProject "SwiftUICraft" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -135,7 +124,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3CBC127C2918B0A300D9DB0E /* MC */,
+				3CBC127C2918B0A300D9DB0E /* SwiftUICraft */,
 			);
 		};
 /* End PBXProject section */
@@ -145,7 +134,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3CBC12882918B0A400D9DB0E /* Preview Assets.xcassets in Resources */,
 				3CBC12852918B0A400D9DB0E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -159,7 +147,7 @@
 			files = (
 				3CB3634A2919DD9000737CF5 /* Level.swift in Sources */,
 				3CBC12832918B0A300D9DB0E /* ContentView.swift in Sources */,
-				3CBC12812918B0A300D9DB0E /* MCApp.swift in Sources */,
+				3CBC12812918B0A300D9DB0E /* SwiftUICraftApp.swift in Sources */,
 				3CB363442919DBF900737CF5 /* MinecraftViewModel.swift in Sources */,
 				3CB363482919DC3800737CF5 /* Utilities.swift in Sources */,
 				3CB363462919DC0600737CF5 /* Models.swift in Sources */,
@@ -290,7 +278,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"MC/Preview Content\"";
 				DEVELOPMENT_TEAM = YA533DMD5J;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -304,7 +291,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.aheze.MC;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aheze.SwiftUICraft;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -319,7 +306,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"MC/Preview Content\"";
 				DEVELOPMENT_TEAM = YA533DMD5J;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -333,7 +319,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.aheze.MC;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aheze.SwiftUICraft;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -344,7 +330,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3CBC12782918B0A300D9DB0E /* Build configuration list for PBXProject "MC" */ = {
+		3CBC12782918B0A300D9DB0E /* Build configuration list for PBXProject "SwiftUICraft" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3CBC12892918B0A400D9DB0E /* Debug */,
@@ -353,7 +339,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3CBC128B2918B0A400D9DB0E /* Build configuration list for PBXNativeTarget "MC" */ = {
+		3CBC128B2918B0A400D9DB0E /* Build configuration list for PBXNativeTarget "SwiftUICraft" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3CBC128C2918B0A400D9DB0E /* Debug */,

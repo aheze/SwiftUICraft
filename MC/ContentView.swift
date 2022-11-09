@@ -244,6 +244,7 @@ struct ContentView: View {
                     .shadow(color: .black, radius: 2, x: 1, y: 1)
                     .opacity(0.5)
             }
+            .allowsHitTesting(false)
         }
         .overlay(alignment: .bottomTrailing) {
             HStack(spacing: 0) {
@@ -422,6 +423,16 @@ struct BlockView: View {
                                 )
                             )
                             .animation(.linear(duration: 0.9).repeatForever(autoreverses: false), value: animated)
+                    }
+                    .overlay(alignment: .bottom) {
+                        Text("getfind.app")
+                            .font(.system(size: 20, weight: .black))
+                            .foregroundColor(.white)
+                            .tracking(2)
+                            .opacity(0.75)
+                            .fixedSize()
+                            .rotationEffect(.degrees(-90))
+                            .offset(y: -180)
                     }
             case .lava:
                 Color.orange

@@ -24,7 +24,7 @@ class MinecraftViewModel: ObservableObject {
     var tilt: CGFloat {
         let translation = savedTranslation + additionalTranslation
         let tilt = 0.3 - (translation / 100)
-        return tilt
+        return max(0.00001, tilt)
     }
     
     var level: Level {

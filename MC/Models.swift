@@ -25,8 +25,9 @@ enum Item: String, CaseIterable {
     case amethyst
     case cactus
     
-    case warpedStem
     case crimsonStem
+    case warpedStem
+    case nylium
     case guildedBlackstone
     case glowstone
     case netherBricks
@@ -112,10 +113,12 @@ enum Item: String, CaseIterable {
             return .amethyst
         case .cactus:
             return .cactus
-        case .warpedStem:
-            return .warpedStem
         case .crimsonStem:
             return .crimsonStem
+        case .warpedStem:
+            return .warpedStem
+        case .nylium:
+            return .nylium
         case .guildedBlackstone:
             return .guildedBlackstone
         case .glowstone:
@@ -179,8 +182,9 @@ enum BlockKind: String, CaseIterable {
     case water
     case waterSource
     
-    case warpedStem
     case crimsonStem
+    case warpedStem
+    case nylium
     case guildedBlackstone
     case glowstone
     case netherBricks
@@ -224,11 +228,12 @@ enum BlockKind: String, CaseIterable {
             return .water
         case .waterSource:
             return .waterSource
-            
-        case .warpedStem:
-            return .differentSides(top: "warped_stem_top", sides: "warped_stem")
         case .crimsonStem:
             return .differentSides(top: "crimson_stem_top", sides: "crimson_stem")
+        case .warpedStem:
+            return .differentSides(top: "warped_stem_top", sides: "warped_stem")
+        case .nylium:
+            return .differentSides(top: "warped_nylium", sides: "warped_nylium_side")
         case .guildedBlackstone:
             return .image("gilded_blackstone")
         case .glowstone:

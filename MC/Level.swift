@@ -300,7 +300,7 @@ extension Level {
         let level = Level(
             items: [
                 .warpedStem,
-                .crimsonStem,
+                .nylium,
                 .guildedBlackstone,
                 .glowstone,
                 .netherBricks,

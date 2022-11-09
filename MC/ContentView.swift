@@ -357,6 +357,8 @@ struct BlockView: View {
     var leftPressed: (() -> Void)?
     var rightPressed: (() -> Void)?
     
+    @State var animated = false
+    
     var top: some View {
         Group {
             switch block.blockKind.texture {
@@ -401,6 +403,18 @@ struct BlockView: View {
                 Color.blue.brightness(-0.1).opacity(0.35)
             case .laser:
                 Color.yellow.opacity(0.3)
+                    .overlay {
+                        Rectangle()
+                            .strokeBorder(
+                                Color.white,
+                                style: .init(
+                                    lineWidth: 1.5,
+                                    lineCap: .square,
+                                    dash: [40, 20],
+                                    dashPhase: animated ? -240 : 0
+                                )
+                            )
+                    }
             case .lava:
                 Color.orange
             case .lavaSource:
@@ -428,6 +442,18 @@ struct BlockView: View {
                 Color.blue.brightness(-0.1).opacity(0.25)
             case .laser:
                 Color.yellow.opacity(0.2)
+                    .overlay {
+                        Rectangle()
+                            .strokeBorder(
+                                Color.white,
+                                style: .init(
+                                    lineWidth: 1.5,
+                                    lineCap: .square,
+                                    dash: [40, 20],
+                                    dashPhase: animated ? 240 : 0
+                                )
+                            )
+                    }
             case .lava:
                 Color.orange
             case .lavaSource:
@@ -515,6 +541,11 @@ struct BlockView: View {
         .frame(width: length, height: length)
         .allowsHitTesting(!block.blockKind.isLiquid)
         .opacity(block.active ? 1 : 0)
+        .onAppear {
+            withAnimation(.linear(duration: 0.9).repeatForever(autoreverses: false)) {
+                animated = true
+            }
+        }
     }
 }
 

@@ -240,7 +240,9 @@ struct ContentView: View {
                 
                 Text("@aheze0")
                     .font(.system(size: 18, weight: .semibold))
-                    .opacity(0.25)
+                    .foregroundColor(.white)
+                    .shadow(color: .black, radius: 2, x: 1, y: 1)
+                    .opacity(0.5)
             }
         }
         .overlay(alignment: .bottomTrailing) {

@@ -77,3 +77,5 @@ SOFTWARE.
 ---
 
 ![Promotional graphic](Assets/SocialPreview.jpg)
+
+*Not affiliated with Minecraft or Microsoft or anything. This was just a weekend project — if there's any copyright stuff or whatever that you'd like me to change, just [message me](https://twitter.com/aheze0).*

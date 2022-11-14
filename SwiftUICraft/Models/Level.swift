@@ -11,7 +11,7 @@ import SwiftUI
 /**
  A saved world along with hotbar items and a gradient background.
  */
-struct Level {
+struct Level: Codable {
     var world: World
     var items: [Item]
     var background: [Int]

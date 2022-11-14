@@ -9,7 +9,7 @@
 import SwiftUI
 
 /// Each world has a set size and stores which blocks are placed.
-struct World {
+struct World: Codable {
     var width: Int
     var height: Int
     var blocks: [Block]

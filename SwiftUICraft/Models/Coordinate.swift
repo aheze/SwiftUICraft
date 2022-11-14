@@ -9,7 +9,7 @@
 import SwiftUI
 
 /// A 3D point in space.
-struct Coordinate: Hashable, Comparable {
+struct Coordinate: Codable, Hashable, Comparable {
     var row: Int
     var column: Int
     var levitation: Int

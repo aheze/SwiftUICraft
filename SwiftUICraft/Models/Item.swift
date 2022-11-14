@@ -9,7 +9,7 @@
 import SwiftUI
 
 /// A hotbar item.
-enum Item: String, CaseIterable {
+enum Item: String, Codable, CaseIterable {
     case dirt
     case grass
     case log

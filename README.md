@@ -11,6 +11,8 @@ Minecraft but made with SwiftUI.
 - Auto-saves your progress.
 - LASERS!
 
+https://user-images.githubusercontent.com/49819455/200998762-50a279ca-6460-4aa9-bb85-0d1b96c580ed.mp4
+
 ![Level 1](Assets/Level1.PNG)
 
 ![Level 2](Assets/Level2.PNG)
@@ -22,14 +24,29 @@ Minecraft but made with SwiftUI.
 ![Level 1 in portrait mode](Assets/Level1Portrait.PNG) | ![Level 2 in portrait mode](Assets/Level2Portrait.PNG)
 --- | ---
 
-
 ![Main menu](Assets/Menu.PNG)
+
+
 
 ## Community
 
 Author | Contributing | Need Help?
 --- | --- | ---
 SwiftUICraft is made by [aheze](https://github.com/SwiftUICraft). | All contributions are welcome. Just [fork](https://github.com/aheze/SwiftUICraft/fork) the repo, then make a pull request. | Open an [issue](https://github.com/aheze/SwiftUICraft/issues) or join the [Discord server](https://discord.com/invite/Pmq8fYcus2). You can also ping me on [Twitter](https://twitter.com/aheze0). Or read the source code — there's lots of comments.
+
+
+### I thought SwiftUI was for making buttons and VStacks and other stuff!
+
+Yes. No one said you couldn't make it 3D though :)
+
+### How does it work?
+
+Perspective transforms. All the 3D functions are warped in my [Prism](https://github.com/aheze/Prism) library which I released last month.
+
+### Is it 100% SwiftUI?
+
+Yep, literally 100%. No UIKit, SceneKit, SpriteKit, or the other stuff. SwiftUI animations are unmatched and has great performance.
+
 
 ## License
 
@@ -61,5 +78,4 @@ SOFTWARE.
 
 ![Promotional graphic](Assets/SocialPreview.jpg)
 
-
-https://user-images.githubusercontent.com/49819455/200998762-50a279ca-6460-4aa9-bb85-0d1b96c580ed.mp4
+*Not affiliated with Minecraft or Microsoft or anything. This was just a weekend project — if there's any copyright stuff or whatever that you'd like me to change, just [message me](https://twitter.com/aheze0).*

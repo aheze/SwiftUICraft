@@ -41,7 +41,7 @@ Yes. No one said you couldn't make it 3D though :)
 
 ### How does it work?
 
-Perspective transforms. All the 3D functions are wraped in my [Prism](https://github.com/aheze/Prism) library which I released last month.
+Perspective transforms. All the 3D functions are wrapped in my [Prism](https://github.com/aheze/Prism) library which I released last month.
 
 ### Is it 100% SwiftUI?
 
